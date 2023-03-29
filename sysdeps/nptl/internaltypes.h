@@ -133,6 +133,7 @@ struct pthread_key_struct
      that zero is even.  We use uintptr_t to not require padding on
      32- and 64-bit machines.  On 64-bit machines it helps to avoid
      wrapping, too.  */
+  // 偶数代表空虚的项
   uintptr_t seq;
 
   /* Destructor for the data.  */
@@ -148,6 +149,7 @@ struct pthread_key_struct
    have to create and destroy a key 2^31 times (on 32-bit platforms,
    on 64-bit platforms that would be 2^63).  If it should happen we
    simply don't use this specific key anymore.  */
+// 创建和删除时都加 1，所以这里是加 2
 #define KEY_USABLE(p) (((uintptr_t) (p)) < ((uintptr_t) ((p) + 2)))
 
 

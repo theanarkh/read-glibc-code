@@ -28,7 +28,7 @@ ___pthread_key_delete (pthread_key_t key)
   if (__glibc_likely (key < PTHREAD_KEYS_MAX))
     {
       unsigned int seq = __pthread_keys[key].seq;
-
+      // seq 加 1 变成偶数，表示空闲
       if (__builtin_expect (! KEY_UNUSED (seq), 1)
 	  && ! atomic_compare_and_exchange_bool_acq (&__pthread_keys[key].seq,
 						     seq + 1, seq))

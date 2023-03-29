@@ -77,6 +77,7 @@ PTHREAD_MUTEX_LOCK (pthread_mutex_t *mutex)
 {
   /* See concurrency notes regarding mutex type which is loaded from __kind
      in struct __pthread_mutex_s in sysdeps/nptl/bits/thread-shared-types.h.  */
+  // 获取锁类型
   unsigned int type = PTHREAD_MUTEX_TYPE_ELISION (mutex);
 
   LIBC_PROBE (mutex_entry, 1, mutex);
@@ -84,7 +85,7 @@ PTHREAD_MUTEX_LOCK (pthread_mutex_t *mutex)
   if (__builtin_expect (type & ~(PTHREAD_MUTEX_KIND_MASK_NP
 				 | PTHREAD_MUTEX_ELISION_FLAGS_NP), 0))
     return __pthread_mutex_lock_full (mutex);
-
+  // 普通锁
   if (__glibc_likely (type == PTHREAD_MUTEX_TIMED_NP))
     {
       FORCE_ELISION (mutex, goto elision);
@@ -106,12 +107,13 @@ PTHREAD_MUTEX_LOCK (pthread_mutex_t *mutex)
     }
 #endif
   else if (__builtin_expect (PTHREAD_MUTEX_TYPE (mutex)
-			     == PTHREAD_MUTEX_RECURSIVE_NP, 1))
+			     == PTHREAD_MUTEX_RECURSIVE_NP, 1)) // 递归锁
     {
       /* Recursive mutex.  */
       pid_t id = THREAD_GETMEM (THREAD_SELF, tid);
 
       /* Check whether we already hold the mutex.  */
+	  // 锁已经被当前线程持有，则引用数加一即可
       if (mutex->__data.__owner == id)
 	{
 	  /* Just bump the counter.  */
@@ -126,7 +128,7 @@ PTHREAD_MUTEX_LOCK (pthread_mutex_t *mutex)
 
       /* We have to get the mutex.  */
       LLL_MUTEX_LOCK_OPTIMIZED (mutex);
-
+	  // 目前还没有线程持有锁，即当前是第一次加锁操作，否则出错
       assert (mutex->__data.__owner == 0);
       mutex->__data.__count = 1;
     }
@@ -136,6 +138,7 @@ PTHREAD_MUTEX_LOCK (pthread_mutex_t *mutex)
       if (LLL_MUTEX_TRYLOCK (mutex) != 0)
 	{
 	  int cnt = 0;
+	  // 重试获取锁的相关配置
 	  int max_cnt = MIN (max_adaptive_count (),
 			     mutex->__data.__spins * 2 + 10);
 	  int spin_count, exp_backoff = 1;
@@ -146,6 +149,7 @@ PTHREAD_MUTEX_LOCK (pthread_mutex_t *mutex)
 		 random jitter, random range is [0, exp_backoff-1].  */
 	      spin_count = exp_backoff + (jitter & (exp_backoff - 1));
 	      cnt += spin_count;
+		  // 如果查过配置，则直接阻塞式加锁，可能导致阻塞
 	      if (cnt >= max_cnt)
 		{
 		  /* If cnt exceeds max spin count, just go to wait
@@ -153,6 +157,7 @@ PTHREAD_MUTEX_LOCK (pthread_mutex_t *mutex)
 		  LLL_MUTEX_LOCK (mutex);
 		  break;
 		}
+		// 否则自旋式加锁
 	      do
 		atomic_spin_nop ();
 	      while (--spin_count > 0);
@@ -160,7 +165,7 @@ PTHREAD_MUTEX_LOCK (pthread_mutex_t *mutex)
 	      exp_backoff = get_next_backoff (exp_backoff);
 	    }
 	  while (LLL_MUTEX_READ_LOCK (mutex) != 0
-		 || LLL_MUTEX_TRYLOCK (mutex) != 0);
+		 || LLL_MUTEX_TRYLOCK (mutex) != 0); //  这里是尝试加锁，失败则下一个循环自旋一段时间后继续尝试
 
 	  mutex->__data.__spins += (cnt - mutex->__data.__spins) / 8;
 	}
@@ -171,11 +176,12 @@ PTHREAD_MUTEX_LOCK (pthread_mutex_t *mutex)
       pid_t id = THREAD_GETMEM (THREAD_SELF, tid);
       assert (PTHREAD_MUTEX_TYPE (mutex) == PTHREAD_MUTEX_ERRORCHECK_NP);
       /* Check whether we already hold the mutex.  */
+	  // 当前线程已经持有锁还尝试加锁则死锁
       if (__glibc_unlikely (mutex->__data.__owner == id))
 	return EDEADLK;
       goto simple;
     }
-
+  // 加锁成功，记录锁的持有者
   pid_t id = THREAD_GETMEM (THREAD_SELF, tid);
 
   /* Record the ownership.  */

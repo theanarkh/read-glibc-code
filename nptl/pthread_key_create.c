@@ -24,19 +24,23 @@ int
 ___pthread_key_create (pthread_key_t *key, void (*destr) (void *))
 {
   /* Find a slot in __pthread_keys which is unused.  */
+  // 遍历找到可用的 slot
   for (size_t cnt = 0; cnt < PTHREAD_KEYS_MAX; ++cnt)
     {
       uintptr_t seq = __pthread_keys[cnt].seq;
-
+      // 空闲且可用
       if (KEY_UNUSED (seq) && KEY_USABLE (seq)
 	  /* We found an unused slot.  Try to allocate it.  */
+    // 设置该 slot 的 seq 为 偶数 + 1，即奇数，表示已占用，成功则返回 0，否则继续找下一个
 	  && ! atomic_compare_and_exchange_bool_acq (&__pthread_keys[cnt].seq,
 						     seq + 1, seq))
 	{
 	  /* Remember the destructor.  */
+    // 设置”析构函数“
 	  __pthread_keys[cnt].destr = destr;
 
 	  /* Return the key to the caller.  */
+    // 返回 key 给调用者
 	  *key = cnt;
 
 	  /* The call succeeded.  */

@@ -45,6 +45,7 @@ __pthread_clockjoin_ex (pthread_t threadid, void **thread_return,
     return ESRCH;
 
   /* Is the thread joinable?.  */
+  // 目的线程处于 detached 状态，不能 join
   if (IS_DETACHED (pd))
     /* We cannot wait for the thread.  */
     return EINVAL;
@@ -53,7 +54,7 @@ __pthread_clockjoin_ex (pthread_t threadid, void **thread_return,
   int result = 0;
 
   LIBC_PROBE (pthread_join, 1, threadid);
-
+  // 不能 join 自己，或者互相 join
   if ((pd == self
        || (self->joinid == pd
 	   && (pd->cancelhandling
@@ -71,6 +72,7 @@ __pthread_clockjoin_ex (pthread_t threadid, void **thread_return,
 
   /* Wait for the thread to finish.  If it is already locked something
      is wrong.  There can only be one waiter.  */
+  // pd->joinid 执行当前线程，表示当前线程在等着 pd 退出
   else if (__glibc_unlikely (atomic_compare_exchange_weak_acquire (&pd->joinid,
 								   &self,
 								   NULL)))

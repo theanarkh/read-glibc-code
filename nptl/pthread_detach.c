@@ -33,6 +33,13 @@ ___pthread_detach (pthread_t th)
   int result = 0;
 
   /* Mark the thread as detached.  */
+  /*
+    atomic_compare_and_exchange_bool_acq 见 glibc/include/atomic.h
+    &pd->joinid 的值为 NULL，则设置为 pd，表示处于 detached 状态，并返回 0
+    &pd->joinid 的值不为 NULL，则不做任何修改直接返回 1，情况有两种
+      1. pd->joinid 的值为 pd，表示已经处于 detached 状态
+      2. pd->joinid 的值为其他 pthread_t，表示其他线程执行了 join pd，即等待 pd 退出，pd 不能执行 detach
+  */
   if (atomic_compare_and_exchange_bool_acq (&pd->joinid, pd, NULL))
     {
       /* There are two possibilities here.  First, the thread might
@@ -48,6 +55,7 @@ ___pthread_detach (pthread_t th)
     if ((pd->cancelhandling & EXITING_BITMASK) != 0)
       /* Note that the code in __free_tcb makes sure each thread
 	 control block is freed only once.  */
+      // 释放线程
       __nptl_free_tcb (pd);
 
   return result;

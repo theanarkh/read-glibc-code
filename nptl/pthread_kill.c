@@ -40,6 +40,7 @@ __pthread_kill_implementation (pthread_t threadid, int signo, int no_tid)
          below.  POSIX only guarantees delivery of a single signal,
          which may not be the right one.)  */
       pid_t tid = INTERNAL_SYSCALL_CALL (gettid);
+      // pid 即线程组 id
       int ret = INTERNAL_SYSCALL_CALL (tgkill, __getpid (), tid, signo);
       return INTERNAL_SYSCALL_ERROR_P (ret) ? INTERNAL_SYSCALL_ERRNO (ret) : 0;
     }
