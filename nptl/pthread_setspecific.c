@@ -52,37 +52,49 @@ ___pthread_setspecific (pthread_key_t key, const void *value)
 	  || KEY_UNUSED ((seq = __pthread_keys[key].seq)))
 	/* Not valid.  */
 	return EINVAL;
-
+      /**
+       * |  |  |
+       * |  |  | .......
+       * |_ |_ |_ _ _ _ _
+       */
+      // 二级数组的 x 轴长度 PTHREAD_KEY_1STLEVEL_SIZE， y 轴长度为 PTHREAD_KEY_2NDLEVEL_SIZE
+      // 拿到一级索引
       idx1st = key / PTHREAD_KEY_2NDLEVEL_SIZE;
+      // 拿到二级索引
       idx2nd = key % PTHREAD_KEY_2NDLEVEL_SIZE;
 
       /* This is the second level array.  Allocate it if necessary.  */
+      // 获取某一 y 轴
       level2 = THREAD_GETMEM_NC (self, specific, idx1st);
+      // 为空则分配内存
       if (level2 == NULL)
 	{
 	  if (value == NULL)
 	    /* We don't have to do anything.  The value would in any case
 	       be NULL.  We can save the memory allocation.  */
 	    return 0;
-
+    // 分配 PTHREAD_KEY_2NDLEVEL_SIZE 个元素
 	  level2
 	    = (struct pthread_key_data *) calloc (PTHREAD_KEY_2NDLEVEL_SIZE,
 						  sizeof (*level2));
 	  if (level2 == NULL)
 	    return ENOMEM;
-
+    // 把地址保存到 x 轴的某个 slot
 	  THREAD_SETMEM_NC (self, specific, idx1st, level2);
 	}
 
       /* Pointer to the right array element.  */
+      // 获取某一个可用项
       level2 = &level2[idx2nd];
 
       /* Remember that we stored at least one set of data.  */
+      // 标记设置过数据了
       THREAD_SETMEM (self, specific_used, true);
     }
 
   /* Store the data and the sequence number so that we can recognize
      stale data.  */
+  // 记录数据
   level2->seq = seq;
   level2->data = (void *) value;
 

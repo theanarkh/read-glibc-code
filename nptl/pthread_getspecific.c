@@ -34,13 +34,14 @@ ___pthread_getspecific (pthread_key_t key)
       if (key >= PTHREAD_KEYS_MAX)
 	/* Not valid.  */
 	return NULL;
-
+      // 计算出位置
       unsigned int idx1st = key / PTHREAD_KEY_2NDLEVEL_SIZE;
       unsigned int idx2nd = key % PTHREAD_KEY_2NDLEVEL_SIZE;
 
       /* If the sequence number doesn't match or the key cannot be defined
 	 for this thread since the second level array is not allocated
 	 return NULL, too.  */
+      // 获取某一个 y 轴
       struct pthread_key_data *level2 = THREAD_GETMEM_NC (THREAD_SELF,
 							  specific, idx1st);
       if (level2 == NULL)
@@ -48,14 +49,15 @@ ___pthread_getspecific (pthread_key_t key)
 	return NULL;
 
       /* There is data.  */
+      // 获取对应的项
       data = &level2[idx2nd];
     }
-
+  // 获取数据
   void *result = data->data;
   if (result != NULL)
     {
       uintptr_t seq = data->seq;
-
+      // 一致性校验
       if (__glibc_unlikely (seq != __pthread_keys[key].seq))
 	result = data->data = NULL;
     }
