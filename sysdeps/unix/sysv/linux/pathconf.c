@@ -1,5 +1,5 @@
 /* Get file-specific information about a file.  Linux version.
-   Copyright (C) 1991-2023 Free Software Foundation, Inc.
+   Copyright (C) 1991-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -139,7 +139,7 @@ __statfs_link_max (int result, const struct statfs *fsbuf, const char *file,
 	/* Not possible, return the default value.  */
 	return LINUX_LINK_MAX;
 
-      /* Some error occured.  */
+      /* Some error occurred.  */
       return -1;
     }
 
@@ -202,7 +202,7 @@ __statfs_filesize_max (int result, const struct statfs *fsbuf)
 	/* Not possible, return the default value.  */
 	return 32;
 
-      /* Some error occured.  */
+      /* Some error occurred.  */
       return -1;
     }
 
@@ -251,7 +251,7 @@ __statfs_symlinks (int result, const struct statfs *fsbuf)
 	/* Not possible, return the default value.  */
 	return 1;
 
-      /* Some error occured.  */
+      /* Some error occurred.  */
       return -1;
     }
 
@@ -286,7 +286,7 @@ __statfs_chown_restricted (int result, const struct statfs *fsbuf)
 	/* Not possible, return the default value.  */
 	return 1;
 
-      /* Some error occured.  */
+      /* Some error occurred.  */
       return -1;
     }
 

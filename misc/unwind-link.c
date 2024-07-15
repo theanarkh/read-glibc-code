@@ -1,5 +1,5 @@
 /* Dynamic loading of the libgcc unwinder.
-   Copyright (C) 2021-2023 Free Software Foundation, Inc.
+   Copyright (C) 2021-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -131,7 +131,7 @@ __libc_unwind_link_after_fork (void)
     }
 }
 
-void __libc_freeres_fn_section
+void
 __libc_unwind_link_freeres (void)
 {
   if (global_libgcc_handle != NULL)

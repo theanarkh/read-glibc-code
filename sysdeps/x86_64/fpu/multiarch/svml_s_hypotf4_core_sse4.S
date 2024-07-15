@@ -1,5 +1,5 @@
 /* Function hypotf vectorized with SSE4.
-   Copyright (C) 2021-2023 Free Software Foundation, Inc.
+   Copyright (C) 2021-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -45,7 +45,7 @@
  *    No multiprecision branch for _LA_ and _EP_
  *      _z = _VARG1 * _VARG1 + _VARG2 * _VARG2
  *
- *    Check _z exponent to be withing borders [1E3 ; 60A] else goto Callout
+ *    Check _z exponent to be within borders [1E3 ; 60A] else goto Callout
  *
  *    Compute resciplicle sqrt s0 ~ 1.0/sqrt(_z),
  *      that multiplied by _z, is final result for _EP_ version.
@@ -117,7 +117,7 @@ ENTRY(_ZGVbN4vv_hypotf_sse4)
 	movaps	%xmm2, %xmm6
 	mulps	%xmm10, %xmm6
 
-	/* Check _z exponent to be withing borders [1E3 ; 60A] else goto Callout */
+	/* Check _z exponent to be within borders [1E3 ; 60A] else goto Callout */
 	movdqu	_LowBoundary+__svml_shypot_data_internal(%rip), %xmm4
 	subps	%xmm6, %xmm5
 
@@ -216,7 +216,7 @@ L(SPECIAL_VALUES_LOOP):
 	cfi_offset(14, -96)
 	# LOE rbx rbp r12 r13 r14 r15 xmm2
 
-	/* Scalar math fucntion call
+	/* Scalar math function call
 	 * to process special input
 	 */
 

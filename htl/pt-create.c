@@ -1,5 +1,5 @@
 /* Thread creation.
-   Copyright (C) 2000-2023 Free Software Foundation, Inc.
+   Copyright (C) 2000-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -35,12 +35,6 @@
 #ifdef HAVE_USELOCALE
 # include <locale.h>
 #endif
-
-/* The total number of pthreads currently active.  This is defined
-   here since it would be really stupid to have a threads-using
-   program that doesn't call `pthread_create'.  */
-unsigned int __pthread_total;
-
 
 /* The entry-point for new threads.  */
 static void
@@ -183,7 +177,9 @@ __pthread_create_internal (struct __pthread **thread,
       err = ENOMEM;
       goto failed_thread_tls_alloc;
     }
+#if TLS_TCB_AT_TP
   pthread->tcb->tcb = pthread->tcb;
+#endif
 
   /* And initialize the rest of the machine context.  This may include
      additional machine- and system-specific initializations that
@@ -205,7 +201,7 @@ __pthread_create_internal (struct __pthread **thread,
   /* Set the new thread's signal mask and set the pending signals to
      empty.  POSIX says: "The signal mask shall be inherited from the
      creating thread.  The set of signals pending for the new thread
-     shall be empty."  If the currnet thread is not a pthread then we
+     shall be empty."  If the current thread is not a pthread then we
      just inherit the process' sigmask.  */
   if (GL (dl_pthread_num_threads) == 1)
     err = __sigprocmask (0, 0, &pthread->init_sigset);

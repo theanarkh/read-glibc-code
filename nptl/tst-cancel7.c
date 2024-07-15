@@ -1,4 +1,4 @@
-/* Copyright (C) 2002-2023 Free Software Foundation, Inc.
+/* Copyright (C) 2002-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -43,7 +43,8 @@ tf (void *arg)
 {
   char *cmd = xasprintf ("%s --direct --sem %s --pidfile %s",
 			 command, semfilename, pidfilename);
-  system (cmd);
+  if (system (cmd))
+    FAIL_EXIT1("system call unexpectedly returned");
   /* This call should never return.  */
   return NULL;
 }

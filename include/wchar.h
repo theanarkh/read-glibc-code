@@ -12,6 +12,7 @@
 # ifndef _ISOMAC
 
 #include <bits/floatn.h>
+#include <bits/wchar2-decl.h>
 #include <stdbool.h>
 
 extern __typeof (wcscasecmp_l) __wcscasecmp_l;
@@ -52,8 +53,8 @@ libc_hidden_proto (__isoc23_wcstoul_l)
 libc_hidden_proto (__isoc23_wcstoll_l)
 libc_hidden_proto (__isoc23_wcstoull_l)
 
-#if __GLIBC_USE (C2X_STRTOL)
-/* Redirect internal uses of these functions to the C2X versions; the
+#if __GLIBC_USE (C23_STRTOL)
+/* Redirect internal uses of these functions to the C23 versions; the
    redirection in the installed header does not work with
    libc_hidden_proto.  */
 # undef wcstol
@@ -165,6 +166,8 @@ libc_hidden_proto (putwc)
 
 libc_hidden_proto (mbrtowc)
 libc_hidden_proto (wcrtomb)
+libc_hidden_proto (__wcrtomb_chk)
+
 extern int __wcscmp (const wchar_t *__s1, const wchar_t *__s2)
      __THROW __attribute_pure__;
 libc_hidden_proto (__wcscmp)
@@ -203,6 +206,8 @@ extern size_t __wcslen (const wchar_t *__s) __attribute_pure__;
 extern size_t __wcsnlen (const wchar_t *__s, size_t __maxlen)
      __attribute_pure__;
 extern wchar_t *__wcscat (wchar_t *dest, const wchar_t *src);
+extern __typeof (wcslcat) __wcslcat;
+libc_hidden_proto (__wcslcat)
 extern wint_t __btowc (int __c) attribute_hidden;
 extern int __mbsinit (const __mbstate_t *__ps);
 extern size_t __mbrtowc (wchar_t *__restrict __pwc,
@@ -237,8 +242,11 @@ extern wchar_t *__wcscpy (wchar_t *__restrict __dest,
 			  const wchar_t *__restrict __src)
 			  attribute_hidden __nonnull ((1, 2));
 libc_hidden_proto (__wcscpy)
+extern __typeof (wcslcpy) __wcslcpy;
+libc_hidden_proto (__wcslcpy)
 extern wchar_t *__wcsncpy (wchar_t *__restrict __dest,
 			   const wchar_t *__restrict __src, size_t __n);
+
 extern wchar_t *__wcpcpy (wchar_t *__dest, const wchar_t *__src);
 extern wchar_t *__wcpncpy (wchar_t *__dest, const wchar_t *__src,
 			   size_t __n);
@@ -254,16 +262,25 @@ extern wchar_t *__wcschrnul (const wchar_t *__s, wchar_t __wc)
 
 extern wchar_t *__wmemset_chk (wchar_t *__s, wchar_t __c, size_t __n,
 			       size_t __ns) __THROW;
+libc_hidden_builtin_proto (__wmemset_chk)
 
 extern int __vfwscanf (__FILE *__restrict __s,
 		       const wchar_t *__restrict __format,
 		       __gnuc_va_list __arg)
      attribute_hidden
      /* __attribute__ ((__format__ (__wscanf__, 2, 0)) */;
+
+extern int __swprintf_chk (wchar_t *__restrict __s, size_t __n,
+			   int __flag, size_t __s_len,
+			   const wchar_t *__restrict __format, ...)
+     __THROW /* __attribute__ ((__format__ (__wprintf__, 5, 6))) */;
+
 extern int __fwprintf (__FILE *__restrict __s,
 		       const wchar_t *__restrict __format, ...)
      attribute_hidden
      /* __attribute__ ((__format__ (__wprintf__, 2, 3))) */;
+extern int __wprintf_chk (int __flag, const wchar_t *__restrict __format,
+			  ...);
 extern int __vfwprintf_chk (FILE *__restrict __s, int __flag,
 			    const wchar_t *__restrict __format,
 			    __gnuc_va_list __arg)
@@ -273,6 +290,10 @@ extern int __vswprintf_chk (wchar_t *__restrict __s, size_t __n,
 			    const wchar_t *__restrict __format,
 			    __gnuc_va_list __arg)
      /* __attribute__ ((__format__ (__wprintf__, 5, 0))) */;
+extern int __fwprintf_chk (__FILE *__restrict __stream, int __flag,
+			   const wchar_t *__restrict __format, ...);
+extern int __vwprintf_chk (int __flag, const wchar_t *__restrict __format,
+			   __gnuc_va_list __ap);
 
 extern int __isoc99_fwscanf (__FILE *__restrict __stream,
 			     const wchar_t *__restrict __format, ...);

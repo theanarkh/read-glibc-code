@@ -1,5 +1,5 @@
 /* Assembly macros for LoongArch.
-   Copyright (C) 2022-2023 Free Software Foundation, Inc.
+   Copyright (C) 2022-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -83,7 +83,7 @@
 #undef ret_NOERRNO
 #define ret_NOERRNO ret
 
-/* Perfroms a system call, returning the error code.  */
+/* Performs a system call, returning the error code.  */
 #undef PSEUDO_ERRVAL
 #define PSEUDO_ERRVAL(name, syscall_name, args) \
   PSEUDO_NOERRNO (name, syscall_name, args); \

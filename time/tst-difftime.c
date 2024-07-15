@@ -1,5 +1,5 @@
 /* Test for difftime
-   Copyright (C) 2021-2023 Free Software Foundation, Inc.
+   Copyright (C) 2021-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -30,7 +30,7 @@ test_difftime_helper (time_t t1, time_t t0, double exp_val)
 static int
 do_test (void)
 {
-  time_t t = 1383791700; /* Provide reproductible start value.  */
+  time_t t = 1383791700; /* Provide reproducible start value.  */
 
   /* Check if difftime works with current time.  */
   test_difftime_helper (t + 1800, t - 1800, 3600.0);

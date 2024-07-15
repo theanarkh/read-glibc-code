@@ -1,4 +1,4 @@
-/* Copyright (C) 2002-2023 Free Software Foundation, Inc.
+/* Copyright (C) 2002-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -20,12 +20,13 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <support/xstdio.h>
 
 static void *
 tf (void *arg)
 {
   char buf[100];
-  fgets (buf, sizeof (buf), arg);
+  xfgets (buf, sizeof (buf), arg);
   /* This call should never return.  */
   return NULL;
 }

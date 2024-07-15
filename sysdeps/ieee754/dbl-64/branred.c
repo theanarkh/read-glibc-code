@@ -1,6 +1,6 @@
 /*
  * IBM Accurate Mathematical Library
- * Copyright (C) 2001-2023 Free Software Foundation, Inc.
+ * Copyright (C) 2001-2024 Free Software Foundation, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -139,5 +139,5 @@ __branred(double x, double *a, double *aa)
  t=(b-s)+bb;
  *a=s;
  *aa=t;
- return ((int) sum)&3; /* return quater of unit circle */
+ return ((int) sum)&3; /* return quarter of unit circle */
 }

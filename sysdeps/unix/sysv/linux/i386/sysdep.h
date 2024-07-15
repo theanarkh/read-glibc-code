@@ -1,4 +1,4 @@
-/* Copyright (C) 1992-2023 Free Software Foundation, Inc.
+/* Copyright (C) 1992-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -61,7 +61,7 @@
    might return a large offset.  Therefore we must not anymore test
    for < 0, but test for a real error by making sure the value in %eax
    is a real error number.  Linus said he will make sure the no syscall
-   returns a value in -1 .. -4095 as a valid result so we can savely
+   returns a value in -1 .. -4095 as a valid result so we can safely
    test with -4095.  */
 
 /* We don't want the label for the error handle to be global when we define
@@ -445,10 +445,5 @@ struct libc_do_syscall_args
 #endif
 
 #endif	/* __ASSEMBLER__ */
-
-/* Each shadow stack slot takes 4 bytes.  Assuming that each stack
-   frame takes 128 bytes, this is used to compute shadow stack size
-   from stack size.  */
-#define STACK_SIZE_TO_SHADOW_STACK_SIZE_SHIFT 5
 
 #endif /* linux/i386/sysdep.h */

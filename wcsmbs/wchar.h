@@ -1,4 +1,4 @@
-/* Copyright (C) 1995-2023 Free Software Foundation, Inc.
+/* Copyright (C) 1995-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -36,6 +36,17 @@
 
 #define __need___va_list
 #include <stdarg.h>
+
+#if defined __USE_XOPEN2K || defined __USE_XOPEN2K8
+# ifdef __GNUC__
+#  ifndef _VA_LIST_DEFINED
+typedef __gnuc_va_list va_list;
+#   define _VA_LIST_DEFINED
+#  endif
+# else
+#  include <stdarg.h>
+# endif
+#endif
 
 #include <bits/wchar.h>
 #include <bits/types/wint_t.h>
@@ -92,6 +103,19 @@ extern wchar_t *wcscpy (wchar_t *__restrict __dest,
 extern wchar_t *wcsncpy (wchar_t *__restrict __dest,
 			 const wchar_t *__restrict __src, size_t __n)
      __THROW __nonnull ((1, 2));
+
+#ifdef __USE_MISC
+/* Copy at most N - 1 characters from SRC to DEST.  */
+extern size_t wcslcpy (wchar_t *__restrict __dest,
+		       const wchar_t *__restrict __src, size_t __n)
+  __THROW __nonnull ((1, 2)) __attr_access ((__write_only__, 1, 3));
+
+/* Append SRC to DEST, possibly with truncation to keep the total size
+   below N.  */
+extern size_t wcslcat (wchar_t *__restrict __dest,
+		       const wchar_t *__restrict __src, size_t __n)
+  __THROW __nonnull ((1, 2))  __attr_access ((__read_write__, 1, 3));
+#endif
 
 /* Append SRC onto DEST.  */
 extern wchar_t *wcscat (wchar_t *__restrict __dest,
@@ -386,7 +410,7 @@ extern long double wcstold (const wchar_t *__restrict __nptr,
 			    wchar_t **__restrict __endptr) __THROW;
 #endif /* C99 */
 
-#if __GLIBC_USE (IEC_60559_TYPES_EXT) && __GLIBC_USE (ISOC2X)
+#if __GLIBC_USE (IEC_60559_TYPES_EXT) && __GLIBC_USE (ISOC23)
 /* Likewise for `_FloatN' and `_FloatNx' when support is enabled.  */
 
 # if __HAVE_FLOAT16
@@ -423,7 +447,7 @@ extern _Float64x wcstof64x (const wchar_t *__restrict __nptr,
 extern _Float128x wcstof128x (const wchar_t *__restrict __nptr,
 			      wchar_t **__restrict __endptr) __THROW;
 # endif
-#endif /* __GLIBC_USE (IEC_60559_TYPES_EXT) && __GLIBC_USE (ISOC2X) */
+#endif /* __GLIBC_USE (IEC_60559_TYPES_EXT) && __GLIBC_USE (ISOC23) */
 
 
 /* Convert initial portion of wide string NPTR to `long int'
@@ -471,7 +495,7 @@ extern unsigned long long int wcstouq (const wchar_t *__restrict __nptr,
 
 /* Versions of the above functions that handle '0b' and '0B' prefixes
    in base 0 or 2.  */
-#if __GLIBC_USE (C2X_STRTOL)
+#if __GLIBC_USE (C23_STRTOL)
 # ifdef __REDIRECT
 extern long int __REDIRECT_NTH (wcstol, (const wchar_t *__restrict __nptr,
 					 wchar_t **__restrict __endptr,
@@ -555,7 +579,7 @@ extern unsigned long long int wcstoull_l (const wchar_t *__restrict __nptr,
 
 /* Versions of the above functions that handle '0b' and '0B' prefixes
    in base 0 or 2.  */
-# if __GLIBC_USE (C2X_STRTOL)
+# if __GLIBC_USE (C23_STRTOL)
 #  ifdef __REDIRECT
 extern long int __REDIRECT_NTH (wcstol_l, (const wchar_t *__restrict __nptr,
 					   wchar_t **__restrict __endptr,
@@ -766,7 +790,7 @@ extern int swscanf (const wchar_t *__restrict __s,
    bits/wchar-ldbl.h.  */
 # if !__GLIBC_USE (DEPRECATED_SCANF) && !defined __LDBL_COMPAT \
      && __LDOUBLE_REDIRECTS_TO_FLOAT128_ABI == 0
-#  if __GLIBC_USE (C2X_STRTOL)
+#  if __GLIBC_USE (C23_STRTOL)
 #   ifdef __REDIRECT
 extern int __REDIRECT (fwscanf, (__FILE *__restrict __stream,
 				 const wchar_t *__restrict __format, ...),
@@ -846,7 +870,7 @@ extern int vswscanf (const wchar_t *__restrict __s,
      && (!defined __LDBL_COMPAT || !defined __REDIRECT) \
      && (defined __STRICT_ANSI__ || defined __USE_XOPEN2K) \
      && __LDOUBLE_REDIRECTS_TO_FLOAT128_ABI == 0
-#  if __GLIBC_USE (C2X_STRTOL)
+#  if __GLIBC_USE (C23_STRTOL)
 #   ifdef __REDIRECT
 extern int __REDIRECT (vfwscanf, (__FILE *__restrict __s,
 				  const wchar_t *__restrict __format,

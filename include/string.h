@@ -88,6 +88,10 @@ libc_hidden_proto (__stpcpy)
 # define __stpcpy(dest, src) __builtin_stpcpy (dest, src)
 #endif
 libc_hidden_proto (__stpncpy)
+extern __typeof (strlcpy) __strlcpy;
+libc_hidden_proto (__strlcpy)
+extern __typeof (strlcat) __strlcat;
+libc_hidden_proto (__strlcat)
 libc_hidden_proto (__rawmemchr)
 libc_hidden_proto (__strcasecmp)
 libc_hidden_proto (__strcasecmp_l)
@@ -204,6 +208,15 @@ extern char *__strcat_chk (char *__restrict __dest,
 extern char *__strncat_chk (char *__restrict __dest,
 			    const char *__restrict __src,
 			    size_t __len, size_t __destlen) __THROW;
+
+libc_hidden_builtin_proto (__memcpy_chk)
+libc_hidden_builtin_proto (__memmove_chk)
+libc_hidden_builtin_proto (__mempcpy_chk)
+libc_hidden_builtin_proto (__memset_chk)
+libc_hidden_builtin_proto (__stpcpy_chk)
+libc_hidden_builtin_proto (__strncpy_chk)
+libc_hidden_builtin_proto (__strcpy_chk)
+
 #endif
 
 #endif

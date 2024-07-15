@@ -1,5 +1,5 @@
 /* Minimal /bin/sh for in-container use.
-   Copyright (C) 2018-2023 Free Software Foundation, Inc.
+   Copyright (C) 2018-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -455,7 +455,12 @@ main (int argc, const char **argv)
     dprintf (stderr, "  argv[%d] is `%s'\n", i, argv[i]);
 
   if (strcmp (argv[1], "-c") == 0)
-    run_command_string (argv[2], argv+3);
+    {
+      if (strcmp (argv[2], "--") == 0)
+		run_command_string (argv[3], argv+4);
+      else
+		run_command_string (argv[2], argv+3);
+    }
   else
     run_script (argv[1], argv+2);
 

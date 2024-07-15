@@ -1,5 +1,5 @@
 /* Definition for thread-local data handling.  NPTL/OpenRISC version.
-   Copyright (C) 2022-2023 Free Software Foundation, Inc.
+   Copyright (C) 2022-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -132,7 +132,7 @@ register tcbhead_t *__thread_self __asm__("r10");
    a struct pthread.  Again, TP points to after tcbhead_t, compensate with
    TLS_INIT_TCB_SIZE.
 
-   I regard this is a seperate system from the "normal" TLS.  */
+   I regard this is a separate system from the "normal" TLS.  */
 
 # define THREAD_SELF \
   ((struct pthread *) ((char *) __thread_self - TLS_INIT_TCB_SIZE \

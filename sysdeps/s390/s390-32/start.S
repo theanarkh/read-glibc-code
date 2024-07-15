@@ -1,5 +1,5 @@
 /* Startup code compliant to the ELF s390 ABI.
-   Copyright (C) 2000-2023 Free Software Foundation, Inc.
+   Copyright (C) 2000-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -80,7 +80,7 @@ _start:
 
 	/* Usually the auxiliary vector can be expected directly after
 	   the environment variables.  But we have to skip extra zeros
-	   because the loader might have removed unsecure variables for
+	   because the loader might have removed insecure variables for
 	   setuid programs.  */
 
 .L26:	l	%r5,0(%r6)

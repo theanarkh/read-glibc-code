@@ -1,5 +1,5 @@
 /* Install given context.
-   Copyright (C) 2008-2023 Free Software Foundation, Inc.
+   Copyright (C) 2008-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -102,7 +102,7 @@ weak_alias (__setcontext, setcontext)
 
    If this NOP word does not exist, FDE lookup just repeatedly finds
    __setcontext's FDE in an infinite loop, due to the convention of using
-   'address - 1' for FDE lookup. Modifiying/deleting the below
+   'address - 1' for FDE lookup. Modifying/deleting the below
    __startcontext's FDE has no help on this.  */
 
 	nop

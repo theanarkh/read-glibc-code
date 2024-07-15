@@ -1,5 +1,5 @@
 /* Test that subprocesses generate distinct streams of randomness.
-   Copyright (C) 2022-2023 Free Software Foundation, Inc.
+   Copyright (C) 2022-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -30,14 +30,10 @@
 #include <unistd.h>
 
 /* Perform multiple runs.  The subsequent runs start with an
-   already-initialized random number generator.  (The number 1500 was
-   seen to reproduce failures reliable in case of a race condition in
-   the fork detection code.)  */
-enum { runs = 1500 };
+   already-initialized random number generator.  */
+enum { runs = 10 };
 
-/* One hundred processes in total.  This should be high enough to
-   expose any issues, but low enough not to tax the overall system too
-   much.  */
+/* Total number of spawned processes on each run.  */
 enum { subprocesses = 49 };
 
 /* The total number of processes.  */

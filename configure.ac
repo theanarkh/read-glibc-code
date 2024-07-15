@@ -52,6 +52,22 @@ fi
 AC_SUBST(cross_compiling)
 AC_PROG_CPP
 
+# This will get text that should go into config.make.
+config_vars=
+
+AC_ARG_ENABLE([static-c++-tests],
+	      AS_HELP_STRING([--disable-static-c++-tests],
+			     [disable static C++ tests@<:@default=no@:>@]),
+	      [static_cxx_tests=$enableval],
+	      [static_cxx_tests=yes])
+LIBC_CONFIG_VAR([static-cxx-tests], [$static_cxx_tests])
+
+AC_ARG_ENABLE([static-c++-link-check],
+	      AS_HELP_STRING([--disable-static-c++-link-check],
+			     [disable static C++ link check @<:@default=no@:>@]),
+	      [static_cxx_link_check=$enableval],
+	      [static_cxx_link_check=yes])
+
 # We need the C++ compiler only for testing.
 AC_PROG_CXX
 # It's useless to us if it can't link programs (e.g. missing -lstdc++).
@@ -61,10 +77,11 @@ AC_LANG_PUSH([C++])
 AC_LINK_IFELSE([AC_LANG_PROGRAM([], [])],
 	       [libc_cv_cxx_link_ok=yes],
 	       [libc_cv_cxx_link_ok=no])
-# Static case.
-old_LDFLAGS="$LDFLAGS"
-LDFLAGS="$LDFLAGS -static"
-AC_LINK_IFELSE([AC_LANG_SOURCE([
+if test $static_cxx_link_check$static_cxx_tests = yesyes; then
+  # Static case.
+  old_LDFLAGS="$LDFLAGS"
+  LDFLAGS="$LDFLAGS -static"
+  AC_LINK_IFELSE([AC_LANG_SOURCE([
 #include <iostream>
 
 int
@@ -74,18 +91,16 @@ main()
   return 0;
 }
 ])],
-	       [],
-	       [libc_cv_cxx_link_ok=no])
-LDFLAGS="$old_LDFLAGS"
+		 [],
+		 [libc_cv_cxx_link_ok=no])
+  LDFLAGS="$old_LDFLAGS"
+fi
 AC_LANG_POP([C++])])
 AS_IF([test $libc_cv_cxx_link_ok != yes], [CXX=])
 
 if test "`cd $srcdir; pwd -P`" = "`pwd -P`"; then
   AC_MSG_ERROR([you must configure in a separate build directory])
 fi
-
-# This will get text that should go into config.make.
-config_vars=
 
 # Check for a --with-gd argument and set libgd-LDFLAGS in config.make.
 AC_ARG_WITH([gd],
@@ -147,13 +162,6 @@ AC_ARG_WITH([headers],
 	    [sysheaders=''])
 AC_SUBST(sysheaders)
 
-AC_SUBST(use_default_link)
-AC_ARG_WITH([default-link],
-	    AS_HELP_STRING([--with-default-link],
-			   [do not use explicit linker scripts]),
-	    [use_default_link=$withval],
-	    [use_default_link=no])
-
 dnl Additional build flags injection.
 AC_ARG_WITH([nonshared-cflags],
 	    AS_HELP_STRING([--with-nonshared-cflags=CFLAGS],
@@ -174,6 +182,15 @@ AC_ARG_WITH([timeoutfactor],
 	    [timeoutfactor=$withval],
 	    [timeoutfactor=1])
 AC_DEFINE_UNQUOTED(TIMEOUTFACTOR, $timeoutfactor)
+
+man_pages_version=6.9.1
+
+AC_ARG_WITH([man-pages],
+	    AS_HELP_STRING([--with-man-pages=VERSION],
+			   [tie manual to a specific man-pages version]),
+	    [man_pages_version=$withval],
+	    [])
+AC_SUBST(man_pages_version)
 
 AC_ARG_ENABLE([sanity-checks],
 	      AS_HELP_STRING([--disable-sanity-checks],
@@ -238,7 +255,7 @@ AC_ARG_ENABLE([stack-protector],
 	      [enable_stack_protector=no])
 case "$enable_stack_protector" in
 all|yes|no|strong) ;;
-*) AC_MSG_ERROR([Not a valid argument for --enable-stack-protector: \"$enable_stack_protector\"]);;
+*) AC_MSG_ERROR([Not a valid argument for --enable-stack-protector: "$enable_stack_protector"]);;
 esac
 
 dnl On some platforms we cannot use dynamic loading.  We must provide
@@ -284,16 +301,6 @@ else
   fi
 fi
 
-dnl For the development we sometimes want gcc to issue even more warnings.
-dnl This is not the default since many of the extra warnings are not
-dnl appropriate.
-AC_ARG_ENABLE([all-warnings],
-	      AS_HELP_STRING([--enable-all-warnings],
-			     [enable all useful warnings gcc can issue]),
-	      [all_warnings=$enableval],
-	      [])
-AC_SUBST(all_warnings)
-
 AC_ARG_ENABLE([werror],
 	      AS_HELP_STRING([--disable-werror],
 			     [do not build with -Werror]),
@@ -306,13 +313,6 @@ AC_ARG_ENABLE([multi-arch],
 			     [enable single DSO with optimizations for multiple architectures]),
 	      [multi_arch=$enableval],
 	      [multi_arch=default])
-
-AC_ARG_ENABLE([experimental-malloc],
-	      AS_HELP_STRING([--disable-experimental-malloc],
-			     [disable experimental malloc features]),
-	      [experimental_malloc=$enableval],
-	      [experimental_malloc=yes])
-AC_SUBST(experimental_malloc)
 
 AC_ARG_ENABLE([memory-tagging],
 	      AS_HELP_STRING([--enable-memory-tagging],
@@ -328,71 +328,6 @@ if test "$memory_tagging" = yes; then
   esac
 fi
 AC_SUBST(memory_tagging)
-
-AC_ARG_ENABLE([crypt],
-              AS_HELP_STRING([--disable-crypt],
-                             [do not build nor install the passphrase hashing library, libcrypt]),
-              [build_crypt=$enableval],
-              [build_crypt=yes])
-AC_SUBST(build_crypt)
-
-AC_ARG_ENABLE([nss-crypt],
-	      AS_HELP_STRING([--enable-nss-crypt],
-			     [enable libcrypt to use nss]),
-	      [nss_crypt=$enableval],
-	      [nss_crypt=no])
-if test x$build_libcrypt = xno && test x$nss_crypt = xyes; then
-  AC_MSG_WARN([--enable-nss-crypt has no effect when libcrypt is disabled])
-  nss_crypt=no
-fi
-if test x$nss_crypt = xyes; then
-  nss_includes=-I$(nss-config --includedir 2>/dev/null)
-  if test $? -ne 0; then
-    AC_MSG_ERROR([cannot find include directory with nss-config])
-  fi
-  nspr_includes=-I$(nspr-config --includedir 2>/dev/null)
-  if test $? -ne 0; then
-    AC_MSG_ERROR([cannot find include directory with nspr-config])
-  fi
-  old_CFLAGS="$CFLAGS"
-  CFLAGS="$CFLAGS $nss_includes $nspr_includes"
-  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([typedef int PRBool;
-#include <hasht.h>
-#include <nsslowhash.h>
-void f (void) { NSSLOW_Init (); }])],
-	     libc_cv_nss_crypt=yes,
-	     AC_MSG_ERROR([
-cannot find NSS headers with lowlevel hash function interfaces]))
-  old_LIBS="$LIBS"
-  old_LDFLAGS="$LDFLAGS"
-  LIBS="$LIBS -lfreebl3"
-  AC_LINK_IFELSE([AC_LANG_PROGRAM([typedef int PRBool;
-#include <hasht.h>
-#include <nsslowhash.h>],
-				  [NSSLOW_Init();])],
-		 libc_cv_nss_crypt=yes,
-		 AC_MSG_ERROR([
-cannot link program using lowlevel NSS hash functions]))
-  # Check to see if there is a static NSS cryptographic library.
-  # If there isn't then we can't link anything with libcrypt.a,
-  # and that might mean disabling some static tests.
-  LDFLAGS="$LDFLAGS -static"
-  AC_LINK_IFELSE([AC_LANG_PROGRAM([typedef int PRBool;
-#include <hasht.h>
-#include <nsslowhash.h>],
-				  [NSSLOW_Init();])],
-		 libc_cv_static_nss_crypt=yes,
-		 libc_cv_static_nss_crypt=no)
-  LDFLAGS="$old_LDFLAGS"
-  CFLAGS="$old_CFLAGS"
-  LIBS="$old_LIBS"
-else
-  libc_cv_nss_crypt=no
-  libc_cv_static_nss_crypt=no
-fi
-AC_SUBST(libc_cv_nss_crypt)
-AC_SUBST(libc_cv_static_nss_crypt)
-
 
 AC_ARG_ENABLE([systemtap],
               [AS_HELP_STRING([--enable-systemtap],
@@ -441,16 +376,6 @@ if test "$build_pt_chown" = yes; then
   AC_DEFINE(HAVE_PT_CHOWN)
 fi
 
-AC_ARG_ENABLE([tunables],
-	      [AS_HELP_STRING([--enable-tunables],
-	       [Enable tunables support. Known values are 'yes', 'no' and 'valstring'])],
-	      [have_tunables=$enableval],
-	      [have_tunables=yes])
-AC_SUBST(have_tunables)
-if test "$have_tunables" = yes; then
-  AC_DEFINE(HAVE_TUNABLES)
-fi
-
 # The abi-tags file uses a fairly simplistic model for name recognition that
 # can't distinguish i486-pc-linux-gnu fully from i486-pc-gnu.  So we mutate a
 # $host_os of `gnu*' here to be `gnu-gnu*' just so that it can tell.
@@ -483,12 +408,23 @@ AC_ARG_ENABLE([cet],
 	      [enable_cet=$libc_cv_compiler_default_cet])
 
 AC_ARG_ENABLE([scv],
-	      AC_HELP_STRING([--disable-scv],
+	      AS_HELP_STRING([--disable-scv],
 			     [syscalls will not use scv instruction, even if the kernel supports it, powerpc only]),
 	      [use_scv=$enableval],
 	      [use_scv=yes])
 
 AS_IF([[test "$use_scv" != "no"]],[AC_DEFINE(USE_PPC_SCV)])
+
+dnl Build glibc with _FORTIFY_SOURCE
+AC_ARG_ENABLE(fortify-source,
+              AS_HELP_STRING([--enable-fortify-source@<:@=1|2|3@:>@],
+                             [Use -D_FORTIFY_SOURCE=[1|2|3] to control code hardening, defaults to highest possible value supported by the build compiler.]),
+              [enable_fortify_source=$enableval],
+              [enable_fortify_source=no])
+case "$enable_fortify_source" in
+1|2|3|no|yes) ;;
+*) AC_MSG_ERROR([Not a valid argument for --enable-fortify-source: "$enable_fortify_source"]);;
+esac
 
 # We keep the original values in `$config_*' and never modify them, so we
 # can write them unchanged into config.make.  Everything else uses
@@ -529,6 +465,9 @@ libc_config_ok=no
 # sysdeps directories sets this to a preprocessor conditional for
 # whether to use such directories.
 with_fp_cond=1
+
+# A preconfigure script may define another name to TLS descriptor variant
+mtls_descriptor=gnu2
 
 dnl Let sysdeps/*/preconfigure act here.
 LIBC_PRECONFIGURE([$srcdir], [for sysdeps])
@@ -1375,7 +1314,7 @@ fi
 rm -f conftest*])
 AC_SUBST(libc_cv_has_glob_dat)
 
-AC_CACHE_CHECK([for -mtls-dialect=gnu2], libc_cv_mtls_dialect_gnu2,
+AC_CACHE_CHECK([for tls descriptor support], libc_cv_mtls_descriptor,
 [dnl
 cat > conftest.c <<EOF
 __thread int i;
@@ -1384,19 +1323,19 @@ void foo (void)
   i = 10;
 }
 EOF
-if AC_TRY_COMMAND([${CC-cc} $CFLAGS $CPPFLAGS -fPIC -mtls-dialect=gnu2 -nostdlib -nostartfiles
-		   conftest.c -o conftest 1>&AS_MESSAGE_LOG_FD])
+if AC_TRY_COMMAND([${CC-cc} $CFLAGS $CPPFLAGS -fPIC -mtls-dialect=$mtls_descriptor -nostdlib -nostartfiles
+		   -shared conftest.c -o conftest 1>&AS_MESSAGE_LOG_FD])
 then
-  libc_cv_mtls_dialect_gnu2=yes
+  libc_cv_mtls_descriptor=$mtls_descriptor
 else
-  libc_cv_mtls_dialect_gnu2=no
+  libc_cv_mtls_descriptor=no
 fi
 rm -f conftest*])
-AC_SUBST(libc_cv_mtls_dialect_gnu2)
-LIBC_CONFIG_VAR([have-mtls-dialect-gnu2], [$libc_cv_mtls_dialect_gnu2])
+AC_SUBST(libc_cv_mtls_descriptor)
+LIBC_CONFIG_VAR([have-mtls-descriptor], [$libc_cv_mtls_descriptor])
 
 dnl clang emits an warning for a double alias redirection, to warn the
-dnl original symbol is sed even when weak definition overriddes it.
+dnl original symbol is sed even when weak definition overrides it.
 dnl It is a usual pattern for weak_alias, where multiple alias point to
 dnl same symbol.
 AC_CACHE_CHECK([if -Wno-ignored-attributes is required for aliases],
@@ -1583,24 +1522,38 @@ if test "x$have_selinux" = xyes; then
 fi
 AC_SUBST(have_selinux)
 
-CPPUNDEFS=
-dnl Check for silly hacked compilers predefining _FORTIFY_SOURCE.
-dnl Since we are building the implementations of the fortified functions here,
-dnl having the macro defined interacts very badly.
-dnl _FORTIFY_SOURCE requires compiler optimization level 1 (gcc -O1)
-dnl and above (see "man FEATURE_TEST_MACROS").
-dnl So do NOT replace AC_COMPILE_IFELSE with AC_PREPROC_IFELSE.
-AC_CACHE_CHECK([for _FORTIFY_SOURCE predefine], libc_cv_predef_fortify_source,
-[AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[
-#ifdef _FORTIFY_SOURCE
-# error bogon
-#endif]])],
-		[libc_cv_predef_fortify_source=no],
-		[libc_cv_predef_fortify_source=yes])])
-if test $libc_cv_predef_fortify_source = yes; then
-  CPPUNDEFS="${CPPUNDEFS:+$CPPUNDEFS }-U_FORTIFY_SOURCE"
-fi
-AC_SUBST(CPPUNDEFS)
+dnl Check if we support the requested _FORTIFY_SOURCE level
+dnl If not, then don't use it.
+dnl Note that _FORTIFY_SOURCE may have been set through FLAGS too.
+dnl _FORTIFY_SOURCE value will be selectively disabled for function that can't
+dnl support it
+no_fortify_source="-Wp,-U_FORTIFY_SOURCE"
+fortify_source="${no_fortify_source}"
+
+AC_CACHE_CHECK([for maximum supported _FORTIFY_SOURCE level],
+	       [libc_cv_supported_fortify_source], [
+    AC_LINK_IFELSE([AC_LANG_PROGRAM([], [__builtin_dynamic_object_size("", 0)])],
+        [libc_cv_supported_fortify_source=3],
+        [libc_cv_supported_fortify_source=2])
+])
+
+AS_CASE([$enable_fortify_source],
+        [yes], [libc_cv_fortify_source=yes enable_fortify_source=$libc_cv_supported_fortify_source],
+        [1|2], [libc_cv_fortify_source=yes],
+        [3], [AS_IF([test $libc_cv_supported_fortify_source = 3],
+                    [libc_cv_fortify_source=yes],
+                    [AC_MSG_ERROR([Compiler doesn't provide necessary support for _FORTIFY_SOURCE=3])])],
+        [libc_cv_fortify_source=no])
+
+AS_IF([test "$libc_cv_fortify_source" = yes],
+      [fortify_source="${fortify_source},-D_FORTIFY_SOURCE=${enable_fortify_source}"]
+      )
+
+AC_SUBST(enable_fortify_source)
+AC_SUBST(libc_cv_fortify_source)
+AC_SUBST(no_fortify_source)
+AC_SUBST(fortify_source)
+LIBC_CONFIG_VAR([supported-fortify], [$libc_cv_supported_fortify_source])
 
 dnl Starting with binutils 2.35, GAS can attach multiple symbol versions
 dnl to one symbol (PR 23840).

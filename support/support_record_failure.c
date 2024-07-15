@@ -1,5 +1,5 @@
 /* Global test failure counter.
-   Copyright (C) 2016-2023 Free Software Foundation, Inc.
+   Copyright (C) 2016-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -32,7 +32,7 @@
    zero, the failure of a test can be detected.
 
    The init constructor function below puts *state on a shared
-   annonymous mapping, so that failure reports from subprocesses
+   anonymous mapping, so that failure reports from subprocesses
    propagate to the parent process.  */
 struct test_failures
 {

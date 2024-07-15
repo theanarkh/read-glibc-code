@@ -1,6 +1,6 @@
 /* memmove/memcpy/mempcpy optimized for aligned access with SSSE3.
    All versions must be listed in ifunc-impl-list.c.
-   Copyright (C) 2022-2023 Free Software Foundation, Inc.
+   Copyright (C) 2022-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -151,13 +151,10 @@ L(more_2x_vec):
 	   loop.  */
 	movups	%xmm0, (%rdi)
 
-# ifdef SHARED_CACHE_SIZE_HALF
-	cmp	$SHARED_CACHE_SIZE_HALF, %RDX_LP
-# else
-	cmp	__x86_shared_cache_size_half(%rip), %rdx
-# endif
+	cmp	__x86_shared_non_temporal_threshold(%rip), %rdx
 	ja	L(large_memcpy)
 
+L(loop_fwd):
 	leaq	-64(%rdi, %rdx), %r8
 	andq	$-16, %rdi
 	movl	$48, %edx
@@ -199,6 +196,13 @@ L(large_memcpy):
 	movups	-64(%r9, %rdx), %xmm10
 	movups	-80(%r9, %rdx), %xmm11
 
+	/* Check if src and dst overlap. If they do use cacheable
+	   writes to potentially gain positive interference between
+	   the loads during the memmove.  */
+	subq	%rdi, %r9
+	cmpq	%rdx, %r9
+	jb	L(loop_fwd)
+
 	sall	$5, %ecx
 	leal	(%rcx, %rcx, 2), %r8d
 	leaq	-96(%rdi, %rdx), %rcx
@@ -231,7 +235,7 @@ L(end_loop_fwd):
 	movups	%xmm7, 48(%r8)
 	ret
 
-	/* Extactly 64 bytes if `jmp L(end_loop_fwd)` is long encoding.
+	/* Exactly 64 bytes if `jmp L(end_loop_fwd)` is long encoding.
 	   60 bytes otherwise.  */
 # define ALIGNED_LOOP_FWD(align_by);	\
 	.p2align 6;	\
@@ -368,7 +372,7 @@ L(end_loop_bkwd):
 	ret
 
 
-	/* Extactly 64 bytes if `jmp L(end_loop_bkwd)` is long encoding.
+	/* Exactly 64 bytes if `jmp L(end_loop_bkwd)` is long encoding.
 	   60 bytes otherwise.  */
 # define ALIGNED_LOOP_BKWD(align_by);	\
 	.p2align 6;	\

@@ -1,5 +1,5 @@
 /* Create a device file relative to an open directory.  Hurd version.
-   Copyright (C) 1991-2023 Free Software Foundation, Inc.
+   Copyright (C) 1991-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -63,10 +63,7 @@ __mknodat (int fd, const char *path, mode_t mode, dev_t dev)
       len = 0;
     }
   else
-    {
-      errno = EINVAL;
-      return -1;
-    }
+    return __hurd_fail (EINVAL);
 
   if (translator != NULL && ! S_ISFIFO (mode))
     {

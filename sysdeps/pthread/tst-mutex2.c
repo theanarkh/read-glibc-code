@@ -1,4 +1,4 @@
-/* Copyright (C) 2002-2023 Free Software Foundation, Inc.
+/* Copyright (C) 2002-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -43,7 +43,7 @@ tf (void *arg)
   e = pthread_mutex_trylock (&m);
   if (e == 0)
     {
-      puts ("child: 1st trylock suceeded");
+      puts ("child: 1st trylock succeeded");
       exit (1);
     }
   if (e != EBUSY)

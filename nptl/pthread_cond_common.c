@@ -1,5 +1,5 @@
 /* pthread_cond_common -- shared code for condition variable.
-   Copyright (C) 2016-2023 Free Software Foundation, Inc.
+   Copyright (C) 2016-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -230,7 +230,7 @@ __condvar_quiesce_and_switch_g1 (pthread_cond_t *cond, uint64_t wseq,
 
   /* First, set the closed flag on __g_signals.  This tells waiters that are
      about to wait that they shouldn't do that anymore.  This basically
-     serves as an advance notificaton of the upcoming change to __g1_start;
+     serves as an advance notification of the upcoming change to __g1_start;
      waiters interpret it as if __g1_start was larger than their waiter
      sequence position.  This allows us to change __g1_start after waiting
      for all existing waiters with group references to leave, which in turn

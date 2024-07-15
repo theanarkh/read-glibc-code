@@ -1,5 +1,5 @@
 /* Test and measure string and memory functions.
-   Copyright (C) 1999-2023 Free Software Foundation, Inc.
+   Copyright (C) 1999-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -130,8 +130,8 @@ cmdline_process_function (int c)
 /* Increase size of FUNC_LIST if assert is triggered at run-time.  */
 static struct libc_ifunc_impl func_list[32];
 static int func_count;
-static int impl_count = -1;
-static impl_t *impl_array;
+static int impl_count __attribute__ ((unused)) = -1;
+static impl_t *impl_array __attribute__ ((unused));
 
 # define FOR_EACH_IMPL(impl, notall) \
   impl_t *impl;								\

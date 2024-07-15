@@ -1,5 +1,5 @@
 /* Generate fastloading iconv module configuration files.
-   Copyright (C) 2000-2023 Free Software Foundation, Inc.
+   Copyright (C) 2000-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    This program is free software; you can redistribute it and/or modify
@@ -398,7 +398,7 @@ print_version (FILE *stream, struct argp_state *state)
 Copyright (C) %s Free Software Foundation, Inc.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
-"), "2023");
+"), "2024");
   fprintf (stream, gettext ("Written by %s.\n"), "Ulrich Drepper");
 }
 
@@ -445,7 +445,7 @@ static void
 add_alias (char *rp)
 {
   /* We now expect two more string.  The strings are normalized
-     (converted to UPPER case) and strored in the alias database.  */
+     (converted to UPPER case) and stored in the alias database.  */
   char *from;
   char *to;
   char *wp;

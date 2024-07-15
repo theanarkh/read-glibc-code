@@ -69,7 +69,7 @@ Support for @code{_Float@var{N}} or @code{_Float@var{N}x} types is
 provided for @code{_Float32}, @code{_Float64} and @code{_Float32x} on
 all platforms.
 It is also provided for @code{_Float128} and @code{_Float64x} on
-powerpc64le (PowerPC 64-bits little-endian), x86_64, x86, ia64,
+powerpc64le (PowerPC 64-bits little-endian), x86_64, x86,
 aarch64, alpha, loongarch, mips64, riscv, s390 and sparc.
 
 @menu
@@ -560,8 +560,11 @@ These functions return the base-2 logarithm of @var{x}.
 @standardsx{logbfNx, TS 18661-3:2015, math.h}
 @safety{@prelim{}@mtsafe{}@assafe{}@acsafe{}}
 These functions extract the exponent of @var{x} and return it as a
-floating-point value.  If @code{FLT_RADIX} is two, @code{logb} is equal
-to @code{floor (log2 (x))}, except it's probably faster.
+floating-point value.
+If @code{FLT_RADIX} is two,
+@code{logb (x)} is similar to @code{floor (log2 (fabs (x)))},
+except that the latter may give an incorrect integer
+due to intermediate rounding.
 
 If @var{x} is de-normalized, @code{logb} returns the exponent @var{x}
 would have if it were normalized.  If @var{x} is infinity (positive or
@@ -697,8 +700,12 @@ Mathematically, it should return a complex number.
 @standardsx{cbrtfN, TS 18661-3:2015, math.h}
 @standardsx{cbrtfNx, TS 18661-3:2015, math.h}
 @safety{@prelim{}@mtsafe{}@assafe{}@acsafe{}}
-These functions return the cube root of @var{x}.  They cannot
-fail; every representable real value has a representable real cube root.
+These functions return the cube root of @var{x}.
+They cannot fail;
+every representable real value
+has a real cube root,
+and rounding it to a representable value
+never causes overflow nor underflow.
 @end deftypefun
 
 @deftypefun double hypot (double @var{x}, double @var{y})
@@ -733,18 +740,88 @@ near zero---a case where @code{exp (@var{x}) - 1} would be inaccurate owing
 to subtraction of two numbers that are nearly equal.
 @end deftypefun
 
+@deftypefun double exp2m1 (double @var{x})
+@deftypefunx float exp2m1f (float @var{x})
+@deftypefunx {long double} exp2m1l (long double @var{x})
+@deftypefunx _FloatN exp2m1fN (_Float@var{N} @var{x})
+@deftypefunx _FloatNx exp2m1fNx (_Float@var{N}x @var{x})
+@standards{TS 18661-4:2015, math.h}
+@safety{@prelim{}@mtsafe{}@assafe{}@acsafe{}}
+These functions return a value equivalent to @code{exp2 (@var{x}) - 1}.
+They are computed in a way that is accurate even if @var{x} is
+near zero---a case where @code{exp2 (@var{x}) - 1} would be inaccurate owing
+to subtraction of two numbers that are nearly equal.
+
+The @code{exp2m1} functions are from TS 18661-4:2015.
+@end deftypefun
+
+@deftypefun double exp10m1 (double @var{x})
+@deftypefunx float exp10m1f (float @var{x})
+@deftypefunx {long double} exp10m1l (long double @var{x})
+@deftypefunx _FloatN exp10m1fN (_Float@var{N} @var{x})
+@deftypefunx _FloatNx exp10m1fNx (_Float@var{N}x @var{x})
+@standards{TS 18661-4:2015, math.h}
+@safety{@prelim{}@mtsafe{}@assafe{}@acsafe{}}
+These functions return a value equivalent to @code{exp10 (@var{x}) - 1}.
+They are computed in a way that is accurate even if @var{x} is
+near zero---a case where @code{exp10 (@var{x}) - 1} would be inaccurate owing
+to subtraction of two numbers that are nearly equal.
+
+The @code{exp10m1} functions are from TS 18661-4:2015.
+@end deftypefun
+
 @deftypefun double log1p (double @var{x})
 @deftypefunx float log1pf (float @var{x})
 @deftypefunx {long double} log1pl (long double @var{x})
 @deftypefunx _FloatN log1pfN (_Float@var{N} @var{x})
 @deftypefunx _FloatNx log1pfNx (_Float@var{N}x @var{x})
+@deftypefunx double logp1 (double @var{x})
+@deftypefunx float logp1f (float @var{x})
+@deftypefunx {long double} logp1l (long double @var{x})
+@deftypefunx _FloatN logp1fN (_Float@var{N} @var{x})
+@deftypefunx _FloatNx logp1fNx (_Float@var{N}x @var{x})
 @standards{ISO, math.h}
 @standardsx{log1pfN, TS 18661-3:2015, math.h}
 @standardsx{log1pfNx, TS 18661-3:2015, math.h}
+@standardsx{logp1, TS 18661-4:2015, math.h}
+@standardsx{logp1f, TS 18661-4:2015, math.h}
+@standardsx{logp1l, TS 18661-4:2015, math.h}
+@standardsx{logp1fN, TS 18661-4:2015, math.h}
+@standardsx{logp1fNx, TS 18661-4:2015, math.h}
 @safety{@prelim{}@mtsafe{}@assafe{}@acsafe{}}
 These functions return a value equivalent to @w{@code{log (1 + @var{x})}}.
 They are computed in a way that is accurate even if @var{x} is
 near zero.
+
+The @code{logp1} names for these functions are from TS 18661-4:2015.
+@end deftypefun
+
+@deftypefun double log2p1 (double @var{x})
+@deftypefunx float log2p1f (float @var{x})
+@deftypefunx {long double} log2p1l (long double @var{x})
+@deftypefunx _FloatN log2p1fN (_Float@var{N} @var{x})
+@deftypefunx _FloatNx log2p1fNx (_Float@var{N}x @var{x})
+@standards{TS 18661-4:2015, math.h}
+@safety{@prelim{}@mtsafe{}@assafe{}@acsafe{}}
+These functions return a value equivalent to @w{@code{log2 (1 + @var{x})}}.
+They are computed in a way that is accurate even if @var{x} is
+near zero.
+
+The @code{log2p1} functions are from TS 18661-4:2015.
+@end deftypefun
+
+@deftypefun double log10p1 (double @var{x})
+@deftypefunx float log10p1f (float @var{x})
+@deftypefunx {long double} log10p1l (long double @var{x})
+@deftypefunx _FloatN log10p1fN (_Float@var{N} @var{x})
+@deftypefunx _FloatNx log10p1fNx (_Float@var{N}x @var{x})
+@standards{TS 18661-4:2015, math.h}
+@safety{@prelim{}@mtsafe{}@assafe{}@acsafe{}}
+These functions return a value equivalent to @w{@code{log10 (1 + @var{x})}}.
+They are computed in a way that is accurate even if @var{x} is
+near zero.
+
+The @code{log10p1} functions are from TS 18661-4:2015.
 @end deftypefun
 
 @cindex complex exponentiation functions

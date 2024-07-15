@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2023 Free Software Foundation, Inc.
+/* Copyright (C) 2003-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -35,7 +35,7 @@ do_test (void)
       if (sysconf (_SC_THREAD_CPUTIME) >= 0)
 # endif
 	{
-	  puts ("cpuclock advertized, but cannot get ID");
+	  puts ("cpuclock advertised, but cannot get ID");
 	  exit (1);
 	}
     }

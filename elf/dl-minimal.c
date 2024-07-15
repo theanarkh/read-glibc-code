@@ -1,5 +1,5 @@
 /* Minimal replacements for basic facilities used in the dynamic linker.
-   Copyright (C) 1995-2023 Free Software Foundation, Inc.
+   Copyright (C) 1995-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -77,7 +77,7 @@ __rtld_malloc_init_real (struct link_map *main_map)
   /* We cannot use relocations and initializers for this because the
      changes made by __rtld_malloc_init_stubs break REL-style
      (non-RELA) relocations that depend on the previous pointer
-     contents.  Also avoid direct relocation depedencies for the
+     contents.  Also avoid direct relocation dependencies for the
      malloc symbols so this function can be called before the final
      rtld relocation (which enables RELRO, after which the pointer
      variables cannot be written to).  */

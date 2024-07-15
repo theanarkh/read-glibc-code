@@ -1,4 +1,4 @@
-/* Copyright (C) 1991-2023 Free Software Foundation, Inc.
+/* Copyright (C) 1991-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -62,7 +62,7 @@ __clock_gettime (clockid_t clock_id, struct timespec *ts)
 	time_value_add (&t, &bi.system_time);
 
 	/* Live threads CPU time.  */
-	count = TASK_EVENTS_INFO_COUNT;
+	count = TASK_THREAD_TIMES_INFO_COUNT;
 	err = __task_info (__mach_task_self (), TASK_THREAD_TIMES_INFO,
 			   (task_info_t) &tti, &count);
 	if (err)
@@ -111,6 +111,7 @@ strong_alias (__clock_gettime, __clock_gettime_2);
 compat_symbol (libc, __clock_gettime_2, clock_gettime, GLIBC_2_2);
 #endif
 
+#if __TIMESIZE != 64
 int
 __clock_gettime64 (clockid_t clock_id, struct __timespec64 *ts64)
 {
@@ -124,3 +125,4 @@ __clock_gettime64 (clockid_t clock_id, struct __timespec64 *ts64)
   return ret;
 }
 libc_hidden_def (__clock_gettime64)
+#endif

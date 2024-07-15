@@ -1,5 +1,5 @@
 /* Exception handling in the dynamic linker.
-   Copyright (C) 1995-2023 Free Software Foundation, Inc.
+   Copyright (C) 1995-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -109,7 +109,7 @@ _dl_signal_exception (int errcode, struct dl_exception *exception,
 rtld_hidden_def (_dl_signal_exception)
 
 void
-_dl_signal_error (int errcode, const char *objname, const char *occation,
+_dl_signal_error (int errcode, const char *objname, const char *occasion,
 		  const char *errstring)
 {
   struct rtld_catch *lcatch = get_catch ();
@@ -126,7 +126,11 @@ _dl_signal_error (int errcode, const char *objname, const char *occation,
       __longjmp (lcatch->env[0].__jmpbuf, 1);
     }
   else
-    fatal_error (errcode, objname, occation, errstring);
+    {
+      if (objname == NULL)
+	objname = "";
+      fatal_error (errcode, objname, occasion, errstring);
+    }
 }
 rtld_hidden_def (_dl_signal_error)
 
@@ -162,12 +166,12 @@ _dl_signal_cexception (int errcode, struct dl_exception *exception,
 }
 
 void
-_dl_signal_cerror (int errcode, const char *objname, const char *occation,
+_dl_signal_cerror (int errcode, const char *objname, const char *occasion,
 		   const char *errstring)
 {
   if (__builtin_expect (GLRO(dl_debug_mask)
 			& ~(DL_DEBUG_STATISTICS), 0))
-    _dl_debug_printf ("%s: error: %s: %s (%s)\n", objname, occation,
+    _dl_debug_printf ("%s: error: %s: %s (%s)\n", objname, occasion,
 		      errstring, receiver ? "continued" : "fatal");
 
   if (receiver)
@@ -178,7 +182,7 @@ _dl_signal_cerror (int errcode, const char *objname, const char *occation,
       (*receiver) (errcode, objname, errstring);
     }
   else
-    _dl_signal_error (errcode, objname, occation, errstring);
+    _dl_signal_error (errcode, objname, occasion, errstring);
 }
 
 void

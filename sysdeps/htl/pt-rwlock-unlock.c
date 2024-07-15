@@ -1,5 +1,5 @@
 /* Unlock a rwlock.  Generic version.
-   Copyright (C) 2000-2023 Free Software Foundation, Inc.
+   Copyright (C) 2000-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -89,7 +89,7 @@ __pthread_rwlock_unlock (pthread_rwlock_t *rwlock)
     }
 
 
-  /* Noone is waiting.  Just unlock it.  */
+  /* No one is waiting.  Just unlock it.  */
 
   __pthread_spin_unlock (&rwlock->__held);
   __pthread_spin_unlock (&rwlock->__lock);

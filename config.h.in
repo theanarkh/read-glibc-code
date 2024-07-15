@@ -141,6 +141,12 @@
 /* LOONGARCH floating-point ABI for ld.so.  */
 #undef LOONGARCH_ABI_FRLEN
 
+/* Define whether compiler support vector.  */
+#undef HAVE_LOONGARCH_VEC_COM
+
+/* Define whether ARM used hard-float and support VFPvX-D32.  */
+#undef HAVE_ARM_PCS_VFP_D32
+
 /* Linux specific: minimum supported kernel version.  */
 #undef	__LINUX_KERNEL_VERSION
 
@@ -150,9 +156,6 @@
 /* Override abi-tags ABI version if necessary.  */
 #undef  __ABI_TAG_VERSION
 
-/* Mach/Hurd specific: define if mig supports the `retcode' keyword.  */
-#undef	HAVE_MIG_RETCODE
-
 /* Mach specific: define if the `host_page_size' RPC is available.  */
 #undef	HAVE_HOST_PAGE_SIZE
 
@@ -161,6 +164,9 @@
 
 /* Mach/i386 specific: define if the `i386_set_gdt' RPC is available.  */
 #undef	HAVE_I386_SET_GDT
+
+/* Hurd specific; define if the `proc_getchildren_rusage' RPC is available.  */
+#undef HAVE_HURD_PROC_GETCHILDREN_RUSAGE
 
 /* Define if inlined system calls are available.  */
 #undef HAVE_INLINED_SYSCALLS
@@ -237,10 +243,6 @@
 
 #ifdef	_LIBC
 
-/* The zic and zdump programs need these definitions.  */
-
-#define	HAVE_STRERROR	1
-
 /* The locale code needs these definitions.  */
 
 #define HAVE_REGEX 1
@@ -271,9 +273,6 @@
 /* PowerPC32 uses fctidz for floating point to long long conversions.  */
 #define HAVE_PPC_FCTIDZ 0
 
-/* Build glibc with tunables support.  */
-#define HAVE_TUNABLES 0
-
 /* Define if PIE is unsupported.  */
 #undef PIE_UNSUPPORTED
 
@@ -289,10 +288,16 @@
 /* Define if x86 ISA level should be included in shared libraries.  */
 #undef INCLUDE_X86_ISA_LEVEL
 
+/* The x86 ISA level.  1 for baseline.  Undefined on non-x86.  */
+#undef MINIMUM_X86_ISA_LEVEL
+
 /* Define if -msahf is enabled by default on x86.  */
 #undef HAVE_X86_LAHF_SAHF
 
 /* Define if -mmovbe is enabled by default on x86.  */
 #undef HAVE_X86_MOVBE
+
+/* Define if -mapxf is enabled by default on x86.  */
+#undef HAVE_X86_APX
 
 #endif

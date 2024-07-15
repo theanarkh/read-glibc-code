@@ -1,5 +1,5 @@
 /* Hurdish implementation of getrandom
-   Copyright (C) 2016-2023 Free Software Foundation, Inc.
+   Copyright (C) 2016-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -123,8 +123,13 @@ again:
                                                     open_flags, 0);
       __libc_rwlock_unlock (lock);
       if (!MACH_PORT_VALID (server))
-        /* No luck.  */
-        return -1;
+	{
+	  if (errno == ENOENT)
+	    /* No translator set up, we won't have support for it.  */
+	    errno = ENOSYS;
+	  /* No luck.  */
+	  return -1;
+	}
 
       goto again;
     }

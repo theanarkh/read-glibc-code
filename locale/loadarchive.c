@@ -1,5 +1,5 @@
 /* Code to load locale data from the locale archive file.
-   Copyright (C) 2002-2023 Free Software Foundation, Inc.
+   Copyright (C) 2002-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -498,7 +498,7 @@ _nl_load_locale_from_archive (int category, const char **namep)
   return lia->data[category];
 }
 
-void __libc_freeres_fn_section
+void
 _nl_archive_subfreeres (void)
 {
   struct locale_in_archive *lia;

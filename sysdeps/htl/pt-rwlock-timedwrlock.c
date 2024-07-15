@@ -1,5 +1,5 @@
 /* Acquire a rwlock for writing.  Generic version.
-   Copyright (C) 2002-2023 Free Software Foundation, Inc.
+   Copyright (C) 2002-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -78,7 +78,7 @@ __pthread_rwlock_timedwrlock_internal (struct __pthread_rwlock *rwlock,
     drain = err ? 1 : 0;
   else
     {
-      /* We're still in the queue.  Noone attempted to wake us up, i.e. we
+      /* We're still in the queue.  No one attempted to wake us up, i.e. we
          timed out.  */
       __pthread_dequeue (self);
       drain = 0;

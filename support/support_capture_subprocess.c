@@ -1,5 +1,5 @@
 /* Capture output from a subprocess.
-   Copyright (C) 2017-2023 Free Software Foundation, Inc.
+   Copyright (C) 2017-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -93,13 +93,14 @@ support_capture_subprocess (void (*callback) (void *), void *closure)
 }
 
 struct support_capture_subprocess
-support_capture_subprogram (const char *file, char *const argv[])
+support_capture_subprogram (const char *file, char *const argv[],
+			    char *const envp[])
 {
   struct support_capture_subprocess result;
   xopen_memstream (&result.out);
   xopen_memstream (&result.err);
 
-  struct support_subprocess proc = support_subprogram (file, argv);
+  struct support_subprocess proc = support_subprogram (file, argv, envp);
 
   support_capture_poll (&result, &proc);
   return result;
@@ -153,9 +154,18 @@ copy_and_spawn_sgid (char *child_id, gid_t gid)
 	  p += wrcount;
 	}
     }
-  TEST_VERIFY (fchown (outfd, getuid (), gid) == 0);
+
+  bool chowned = false;
+  TEST_VERIFY ((chowned = fchown (outfd, getuid (), gid) == 0)
+	       || errno == EPERM);
   if (support_record_failure_is_failed ())
     goto err;
+  else if (!chowned)
+    {
+      ret = 77;
+      goto err;
+    }
+
   TEST_VERIFY (fchmod (outfd, 02750) == 0);
   if (support_record_failure_is_failed ())
     goto err;
@@ -192,8 +202,10 @@ err:
       free (dirname);
     }
 
+  if (ret == 77)
+    FAIL_UNSUPPORTED ("Failed to make sgid executable for test\n");
   if (ret != 0)
-    FAIL_EXIT1("Failed to make sgid executable for test\n");
+    FAIL_EXIT1 ("Failed to make sgid executable for test\n");
 
   return status;
 }

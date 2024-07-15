@@ -1,5 +1,5 @@
 /* Function atan2 vectorized with AVX2.
-   Copyright (C) 2021-2023 Free Software Foundation, Inc.
+   Copyright (C) 2021-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -170,11 +170,11 @@ ENTRY(_ZGVdN4vv_atan2_avx2)
 	/*  Special branch for fast (vector) processing of zero arguments  */
 	testl	%eax, %eax
 
-	/* Go to auxilary branch */
+	/* Go to auxiliary branch */
 	jne	L(AUX_BRANCH)
 	# LOE rbx r12 r13 r14 r15 edx xmm3 ymm0 ymm1 ymm2 ymm4 ymm5 ymm6 ymm7 ymm8
 
-	/* Return from auxilary branch
+	/* Return from auxiliary branch
 	 * for out of main path inputs
 	 */
 
@@ -271,7 +271,7 @@ L(SPECIAL_VALUES_LOOP):
 	.cfi_escape 0x10, 0x0e, 0x0e, 0x38, 0x1c, 0x0d, 0xe0, 0xff, 0xff, 0xff, 0x1a, 0x0d, 0x80, 0xff, 0xff, 0xff, 0x22
 	# LOE rbx r12 r13 r14 r15 ymm0
 
-	/* Scalar math fucntion call
+	/* Scalar math function call
 	 * to process special input
 	 */
 
@@ -291,7 +291,7 @@ L(SCALAR_MATH_CALL):
 	cfi_restore(14)
 	# LOE rbx r15 r12d r13d
 
-	/* Auxilary branch
+	/* Auxiliary branch
 	 * for out of main path inputs
 	 */
 

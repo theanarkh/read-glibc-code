@@ -1,4 +1,4 @@
-/* Copyright (C) 2002-2023 Free Software Foundation, Inc.
+/* Copyright (C) 2002-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -45,11 +45,7 @@
 
 static inline short max_adaptive_count (void)
 {
-#if HAVE_TUNABLES
   return __mutex_aconf.spin_count;
-#else
-  return DEFAULT_ADAPTIVE_COUNT;
-#endif
 }
 
 

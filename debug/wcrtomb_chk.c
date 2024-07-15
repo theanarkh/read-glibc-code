@@ -1,4 +1,4 @@
-/* Copyright (C) 2005-2023 Free Software Foundation, Inc.
+/* Copyright (C) 2005-2024 Free Software Foundation, Inc.
    Copyright The GNU Toolchain Authors.
    This file is part of the GNU C Library.
 
@@ -28,3 +28,4 @@ __wcrtomb_chk (char *s, wchar_t wchar, mbstate_t *ps, size_t buflen)
 {
   return __wcrtomb_internal (s, wchar, ps, buflen);
 }
+libc_hidden_def (__wcrtomb_chk)

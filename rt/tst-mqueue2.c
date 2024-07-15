@@ -1,5 +1,5 @@
 /* Test message queue passing.
-   Copyright (C) 2004-2023 Free Software Foundation, Inc.
+   Copyright (C) 2004-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -463,12 +463,12 @@ do_test (void)
 
   if (mq_unlink ("/tst-mqueue2-which-should-never-exist") != -1)
     {
-      puts ("mq_unlink of non-existant message queue unexpectedly succeeded");
+      puts ("mq_unlink of non-existent message queue unexpectedly succeeded");
       result = 1;
     }
   else if (errno != ENOENT)
     {
-      printf ("mq_unlink of non-existant message queue did not fail with "
+      printf ("mq_unlink of non-existent message queue did not fail with "
 	      "ENOENT: %m\n");
       result = 1;
     }

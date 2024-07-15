@@ -1,5 +1,5 @@
 /* Allocation from a fixed-size buffer.
-   Copyright (C) 2017-2023 Free Software Foundation, Inc.
+   Copyright (C) 2017-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -304,7 +304,7 @@ __alloc_buffer_next (struct alloc_buffer *buf, size_t align)
 }
 
 /* Like alloc_buffer_alloc, but do not advance the pointer beyond the
-   object (so a subseqent call to alloc_buffer_next or
+   object (so a subsequent call to alloc_buffer_next or
    alloc_buffer_alloc returns the same pointer).  Note that the buffer
    is still aligned according to the requirements of TYPE, potentially
    consuming buffer space.  The effect of this function is similar to

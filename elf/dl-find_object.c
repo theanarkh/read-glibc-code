@@ -1,5 +1,5 @@
 /* Locating objects in the process image.  ld.so implementation.
-   Copyright (C) 2021-2023 Free Software Foundation, Inc.
+   Copyright (C) 2021-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -46,7 +46,7 @@ _dl_find_object_slow (void *pc, struct dl_find_object *result)
           struct dl_find_object_internal internal;
           _dl_find_object_from_map (l, &internal);
           _dl_find_object_to_external (&internal, result);
-          return 1;
+          return 0;
         }
 
   /* Object not found.  */
@@ -312,7 +312,7 @@ _dlfo_mappings_active_segment (uint64_t start_version)
   return _dlfo_loaded_mappings[start_version & 1];
 }
 
-/* Searches PC amoung the address-sorted array [FIRST1, FIRST1 +
+/* Searches PC among the address-sorted array [FIRST1, FIRST1 +
    SIZE).  Assumes PC >= FIRST1->map_start.  Returns a pointer to the
    element that contains PC, or NULL if there is no such element.  */
 static inline struct dl_find_object_internal *
@@ -356,7 +356,7 @@ _dlfo_lookup (uintptr_t pc, struct dl_find_object_internal *first1, size_t size)
 }
 
 int
-_dl_find_object (void *pc1, struct dl_find_object *result)
+__dl_find_object (void *pc1, struct dl_find_object *result)
 {
   uintptr_t pc = (uintptr_t) pc1;
 
@@ -463,7 +463,8 @@ _dl_find_object (void *pc1, struct dl_find_object *result)
         return -1;
     } /* Transaction retry loop.  */
 }
-rtld_hidden_def (_dl_find_object)
+hidden_def (__dl_find_object)
+weak_alias (__dl_find_object, _dl_find_object)
 
 /* _dlfo_process_initial is called twice.  First to compute the array
    sizes from the initial loaded mappings.  Second to fill in the

@@ -1,4 +1,4 @@
-/* Copyright (C) 2002-2023 Free Software Foundation, Inc.
+/* Copyright (C) 2002-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -43,7 +43,7 @@ __pthread_getattr_np (pthread_t thread_id, pthread_attr_t *attr)
   lll_lock (thread->lock, LLL_PRIVATE);
 
   /* The thread library is responsible for keeping the values in the
-     thread desriptor up-to-date in case the user changes them.  */
+     thread descriptor up-to-date in case the user changes them.  */
   memcpy (&iattr->schedparam, &thread->schedparam,
 	  sizeof (struct sched_param));
   iattr->schedpolicy = thread->schedpolicy;

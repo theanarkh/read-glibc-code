@@ -1,4 +1,4 @@
-/* Copyright (C) 1997-2023 Free Software Foundation, Inc.
+/* Copyright (C) 1997-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -361,7 +361,8 @@ __addseverity (int severity, const char *string)
 weak_alias (__addseverity, addseverity)
 
 
-libc_freeres_fn (free_mem)
+void
+__libc_fmtmsg_freemem (void)
 {
   struct severity_info *runp = severity_list;
 

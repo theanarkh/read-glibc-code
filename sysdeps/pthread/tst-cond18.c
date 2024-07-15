@@ -1,4 +1,4 @@
-/* Copyright (C) 2004-2023 Free Software Foundation, Inc.
+/* Copyright (C) 2004-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -24,6 +24,8 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include <support/xunistd.h>
+
 pthread_cond_t cv = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 bool exiting;
@@ -40,7 +42,7 @@ tf (void *id)
       while (!exiting)
 	{
 	  if ((spins++ % 1000) == 0)
-	    write (fd, ".", 1);
+	    xwrite (fd, ".", 1);
 	  pthread_mutex_unlock (&lock);
 
 	  pthread_mutex_lock (&lock);

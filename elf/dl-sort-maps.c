@@ -1,5 +1,5 @@
 /* Sort array of link maps according to dependencies.
-   Copyright (C) 2017-2023 Free Software Foundation, Inc.
+   Copyright (C) 2017-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -120,11 +120,6 @@ _dl_sort_maps_original (struct link_map **maps, unsigned int nmaps,
     next:;
     }
 }
-
-#if !HAVE_TUNABLES
-/* In this case, just default to the original algorithm.  */
-strong_alias (_dl_sort_maps_original, _dl_sort_maps);
-#else
 
 /* We use a recursive function due to its better clarity and ease of
    implementation, as well as faster execution speed. We already use
@@ -260,13 +255,12 @@ _dl_sort_maps_dfs (struct link_map **maps, unsigned int nmaps,
 	     The below memcpy is not needed in the do_reldeps case here,
 	     since we wrote back to maps[] during DFS traversal.  */
 	  if (maps_head == maps)
-	    return;
+	    break;
 	}
       assert (maps_head == maps);
-      return;
     }
-
-  memcpy (maps, rpo, sizeof (struct link_map *) * nmaps);
+  else
+    memcpy (maps, rpo, sizeof (struct link_map *) * nmaps);
 
   /* Skipping the first object at maps[0] is not valid in general,
      since traversing along object dependency-links may "find" that
@@ -314,5 +308,3 @@ _dl_sort_maps (struct link_map **maps, unsigned int nmaps,
   else
     _dl_sort_maps_dfs (maps, nmaps, force_first, for_fini);
 }
-
-#endif /* HAVE_TUNABLES.  */

@@ -1,5 +1,5 @@
 /* Emulate Emacs heap dumping to test malloc_set_state.
-   Copyright (C) 2001-2023 Free Software Foundation, Inc.
+   Copyright (C) 2001-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -45,7 +45,7 @@ enum allocation_action
     action_free,                /* Dumped and freed.  */
     action_realloc,             /* Dumped and realloc'ed.  */
     action_realloc_same,        /* Dumped and realloc'ed, same size.  */
-    action_realloc_smaller,     /* Dumped and realloc'ed, shrinked.  */
+    action_realloc_smaller,     /* Dumped and realloc'ed, shrunk.  */
     action_count
   };
 

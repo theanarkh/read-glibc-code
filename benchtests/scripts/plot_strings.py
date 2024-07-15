@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # Plot GNU C Library string microbenchmark output.
-# Copyright (C) 2019-2023 Free Software Foundation, Inc.
+# Copyright (C) 2019-2024 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 #
 # The GNU C Library is free software; you can redistribute it and/or
@@ -276,7 +276,7 @@ def plotRecursive(json_iter, routine, ifuncs, bench_variant, title, outpath,
     domain = np.unique(np.array(domain))
     averages = []
 
-    # Compute geometric mean if there are multple timings for each
+    # Compute geometric mean if there are multiple timings for each
     # parameter value.
     for parameter in domain:
         averages.append(gmean(timings[parameter]))

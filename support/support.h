@@ -1,5 +1,5 @@
 /* Common extra functions.
-   Copyright (C) 2016-2023 Free Software Foundation, Inc.
+   Copyright (C) 2016-2024 Free Software Foundation, Inc.
    Copyright The GNU Toolchain Authors.
    This file is part of the GNU C Library.
 
@@ -144,6 +144,8 @@ extern const char support_slibdir_prefix[];
 extern const char support_install_rootsbindir[];
 /* Corresponds to the install's compiled locale directory.  */
 extern const char support_complocaledir_prefix[];
+/* Corresponds to the install's etc/ directory.  */
+extern const char support_sysconfdir_prefix[];
 
 /* Copies the file at the path FROM to TO.  If TO does not exist, it
    is created.  If TO is a regular file, it is truncated before
@@ -232,6 +234,10 @@ void support_stack_free (struct support_stack *stack);
    RLIMIT_NOFILE if required.
    The returned value is the lowest file descriptor number.  */
 int support_open_dev_null_range (int num, int flags, mode_t mode);
+
+
+/* Check if kernel supports set VMA range name.  */
+extern bool support_set_vma_name_supported (void);
 
 __END_DECLS
 

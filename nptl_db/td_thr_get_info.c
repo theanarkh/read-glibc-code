@@ -1,5 +1,5 @@
 /* Get thread information.
-   Copyright (C) 1999-2023 Free Software Foundation, Inc.
+   Copyright (C) 1999-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -85,7 +85,7 @@ td_thr_get_info (const td_thrhandle_t *th, td_thrinfo_t *infop)
   if (err != TD_OK)
     return err;
 
-  /* Fill in information.  Clear first to provide reproducable
+  /* Fill in information.  Clear first to provide reproducible
      results for the fields we do not fill in.  */
   memset (infop, '\0', sizeof (td_thrinfo_t));
 

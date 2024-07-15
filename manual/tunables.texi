@@ -52,11 +52,12 @@ glibc.elision.skip_lock_busy: 3 (min: 0, max: 2147483647)
 glibc.malloc.top_pad: 0x20000 (min: 0x0, max: 0xffffffffffffffff)
 glibc.cpu.x86_rep_stosb_threshold: 0x800 (min: 0x1, max: 0xffffffffffffffff)
 glibc.cpu.x86_non_temporal_threshold: 0xc0000 (min: 0x4040, max: 0xfffffffffffffff)
+glibc.cpu.x86_memset_non_temporal_threshold: 0xc0000 (min: 0x4040, max: 0xfffffffffffffff)
 glibc.cpu.x86_shstk:
 glibc.pthread.stack_cache_size: 0x2800000 (min: 0x0, max: 0xffffffffffffffff)
-glibc.cpu.hwcap_mask: 0x6 (min: 0x0, max: 0xffffffffffffffff)
 glibc.malloc.mmap_max: 0 (min: 0, max: 2147483647)
 glibc.elision.skip_trylock_internal_abort: 3 (min: 0, max: 2147483647)
+glibc.cpu.plt_rewrite: 0 (min: 0, max: 2)
 glibc.malloc.tcache_unsorted_limit: 0x0 (min: 0x0, max: 0xffffffffffffffff)
 glibc.cpu.x86_ibt:
 glibc.cpu.hwcaps:
@@ -136,9 +137,7 @@ termination of the process.
 Like @env{MALLOC_CHECK_}, @code{glibc.malloc.check} has a problem in that it
 diverges from normal program behavior by writing to @code{stderr}, which could
 by exploited in SUID and SGID binaries.  Therefore, @code{glibc.malloc.check}
-is disabled by default for SUID and SGID binaries.  This can be enabled again
-by the system administrator by adding a file @file{/etc/suid-debug}; the
-content of the file could be anything or even empty.
+is disabled by default for SUID and SGID binaries.
 @end deftp
 
 @deftp Tunable glibc.malloc.top_pad
@@ -346,6 +345,16 @@ performance issues of @samp{1}.
 The default value of this tunable is @samp{2}.
 @end deftp
 
+@deftp Tunable glibc.rtld.enable_secure
+Used to run a program as if it were a setuid process.  The only valid value
+is @samp{1} as this tunable can only be used to set and not unset
+@code{enable_secure}.  Setting this tunable to @samp{1} also disables all other
+tunables.  This tunable is intended to facilitate more extensive verification
+tests for @code{AT_SECURE} programs and not meant to be a security feature.
+
+The default value of this tunable is @samp{0}.
+@end deftp
+
 @node Elision Tunables
 @section Elision Tunables
 @cindex elision tunables
@@ -446,7 +455,7 @@ stack cache exceeds this size, unused thread stacks are returned to
 the kernel, to bring the cache size below this limit.
 
 The value is measured in bytes.  The default is @samp{41943040}
-(fourty mibibytes).
+(forty mibibytes).
 @end deftp
 
 @deftp Tunable glibc.pthread.rseq
@@ -457,6 +466,21 @@ The default is @samp{1}, which means that @theglibc{} performs
 registration on behalf of the application.
 
 Restartable sequences are a Linux-specific extension.
+@end deftp
+
+@deftp Tunable glibc.pthread.stack_hugetlb
+This tunable controls whether to use Huge Pages in the stacks created by
+@code{pthread_create}.  This tunable only affects the stacks created by
+@theglibc{}, it has no effect on stack assigned with
+@code{pthread_attr_setstack}.
+
+The default is @samp{1} where the system default value is used.  Setting
+its value to @code{0} enables the use of @code{madvise} with
+@code{MADV_NOHUGEPAGE} after stack creation with @code{mmap}.
+
+This is a memory utilization optimization, since internal glibc setup of either
+the thread descriptor and the guard page might force the kernel to move the
+thread stack originally backup by Huge Pages to default pages.
 @end deftp
 
 @node Hardware Capability Tunables
@@ -471,21 +495,12 @@ Restartable sequences are a Linux-specific extension.
 @cindex shared_cache_size tunables
 @cindex tunables, shared_cache_size
 @cindex non_temporal_threshold tunables
-@cindex tunables, non_temporal_threshold
+@cindex memset_non_temporal_threshold tunables
+@cindex tunables, non_temporal_threshold, memset_non_temporal_threshold
 
 @deftp {Tunable namespace} glibc.cpu
 Behavior of @theglibc{} can be tuned to assume specific hardware capabilities
 by setting the following tunables in the @code{cpu} namespace:
-@end deftp
-
-@deftp Tunable glibc.cpu.hwcap_mask
-This tunable supersedes the @env{LD_HWCAP_MASK} environment variable and is
-identical in features.
-
-The @code{AT_HWCAP} key in the Auxiliary Vector specifies instruction set
-extensions available in the processor at runtime for some architectures.  The
-@code{glibc.cpu.hwcap_mask} tunable allows the user to mask out those
-capabilities at runtime, thus disabling use of those extensions.
 @end deftp
 
 @deftp Tunable glibc.cpu.hwcaps
@@ -498,7 +513,13 @@ On s390x, the supported HWCAP and STFLE features can be found in
 @code{sysdeps/s390/cpu-features.c}.  In addition the user can also set
 a CPU arch-level like @code{z13} instead of single HWCAP and STFLE features.
 
-This tunable is specific to i386, x86-64 and s390x.
+On powerpc, the supported HWCAP and HWCAP2 features can be found in
+@code{sysdeps/powerpc/dl-procinfo.c}.
+
+On loongarch, the supported HWCAP features can be found in
+@code{sysdeps/loongarch/cpu-tunables.c}.
+
+This tunable is specific to i386, x86-64, s390x, powerpc and loongarch.
 @end deftp
 
 @deftp Tunable glibc.cpu.cached_memopt
@@ -514,7 +535,7 @@ This tunable is specific to powerpc, powerpc64 and powerpc64le.
 @deftp Tunable glibc.cpu.name
 The @code{glibc.cpu.name=xxx} tunable allows the user to tell @theglibc{} to
 assume that the CPU is @code{xxx} where xxx may have one of these values:
-@code{generic}, @code{falkor}, @code{thunderxt88}, @code{thunderx2t99},
+@code{generic}, @code{thunderxt88}, @code{thunderx2t99},
 @code{thunderx2t99p1}, @code{ares}, @code{emag}, @code{kunpeng},
 @code{a64fx}.
 
@@ -543,6 +564,18 @@ like memmove and memcpy.
 
 This tunable is specific to i386 and x86-64.
 @end deftp
+
+@deftp Tunable glibc.cpu.x86_memset_non_temporal_threshold
+The @code{glibc.cpu.x86_memset_non_temporal_threshold} tunable allows
+the user to set threshold in bytes for non temporal store in
+memset. Non temporal stores give a hint to the hardware to move data
+directly to memory without displacing other data from the cache. This
+tunable is used by some platforms to determine when to use non
+temporal stores memset.
+
+This tunable is specific to i386 and x86-64.
+@end deftp
+
 
 @deftp Tunable glibc.cpu.x86_rep_movsb_threshold
 The @code{glibc.cpu.x86_rep_movsb_threshold} tunable allows the user to
@@ -598,6 +631,16 @@ this tunable.
 This tunable is specific to 64-bit x86-64.
 @end deftp
 
+@deftp Tunable glibc.cpu.plt_rewrite
+When this tunable is set to @code{1}, the dynamic linker will rewrite
+the PLT section with 32-bit direct jump.  When it is set to @code{2},
+the dynamic linker will rewrite the PLT section with 32-bit direct
+jump and on APX processors with 64-bit absolute jump.
+
+This tunable is specific to x86-64 and effective only when the lazy
+binding is disabled.
+@end deftp
+
 @node Memory Related Tunables
 @section Memory Related Tunables
 @cindex memory related tunables
@@ -610,7 +653,7 @@ and the process manage memory.
 @deftp Tunable glibc.mem.tagging
 If the hardware supports memory tagging, this tunable can be used to
 control the way @theglibc{} uses this feature.  At present this is only
-supported on AArch64 systems with the MTE extention; it is ignored for
+supported on AArch64 systems with the MTE extension; it is ignored for
 all other systems.
 
 This tunable takes a value between 0 and 255 and acts as a bitmask
@@ -633,6 +676,23 @@ Other bits are currently reserved.
 support in the kernel if this tunable has any non-zero value.
 
 The default value is @samp{0}, which disables all memory tagging.
+@end deftp
+
+@deftp Tunable glibc.mem.decorate_maps
+If the kernel supports naming anonymous virtual memory areas (since
+Linux version 5.17, although not always enabled by some kernel
+configurations), this tunable can be used to control whether
+@theglibc{} decorates the underlying memory obtained from operating
+system with a string describing its usage (for instance, on the thread
+stack created by @code{ptthread_create} or memory allocated by
+@code{malloc}).
+
+The process mappings can be obtained by reading the @code{/proc/<pid>maps}
+(with @code{pid} being either the @dfn{process ID} or @code{self} for the
+process own mapping).
+
+This tunable takes a value of 0 and 1, where 1 enables the feature.
+The default value is @samp{0}, which disables the decoration.
 @end deftp
 
 @node gmon Tunables

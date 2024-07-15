@@ -1,4 +1,4 @@
-/* Copyright (C) 2000-2023 Free Software Foundation, Inc.
+/* Copyright (C) 2000-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -22,7 +22,7 @@
 #include "posix-timer.h"
 
 
-/* Get current value of timer TIMERID and store it in VLAUE.  */
+/* Get current value of timer TIMERID and store it in VALUE.  */
 int
 timer_gettime (timer_t timerid, struct itimerspec *value)
 {

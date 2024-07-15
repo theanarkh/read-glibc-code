@@ -1,4 +1,4 @@
-/* Copyright (C) 1993-2023 Free Software Foundation, Inc.
+/* Copyright (C) 1993-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -77,8 +77,6 @@ typedef struct
      provided by the user.  */
   wchar_t overflow_buf[64];
 } _IO_wstrnfile;
-
-extern const struct _IO_jump_t _IO_wstrn_jumps attribute_hidden;
 
 /* Initialize an _IO_strfile SF to read from narrow string STRING, and
    return the corresponding FILE object.  It is not necessary to fclose

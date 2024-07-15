@@ -207,6 +207,9 @@ hardened variant that does additional safety checks at runtime.  Some
 hardened variants need the size of the buffer to perform access
 validation and this is provided by the @code{__builtin_object_size} or
 the @code{__builtin_dynamic_object_size} builtin functions.
+@code{_FORTIFY_SOURCE} also enables additional compile time diagnostics,
+such as unchecked return values from some functions, to encourage
+developers to add error checking for those functions.
 
 At runtime, if any of those safety checks fail, the program will
 terminate with a @code{SIGABRT} signal.  @code{_FORTIFY_SOURCE} may be
@@ -368,6 +371,10 @@ The following functions and macros are fortified in @theglibc{}:
 
 @item @code{strcpy}
 
+@item @code{strlcat}
+
+@item @code{strlcpy}
+
 @item @code{strncat}
 
 @item @code{strncpy}
@@ -407,6 +414,10 @@ The following functions and macros are fortified in @theglibc{}:
 @item @code{wcscat}
 
 @item @code{wcscpy}
+
+@item @code{wcslcat}
+
+@item @code{wcslcpy}
 
 @item @code{wcsncat}
 
@@ -479,6 +490,10 @@ corresponding @code{__time64_t}-related macro, the name of which is
 derived as in the dual-time configuration case, and which expands to
 the symbol's name.  For instance, the macro @code{__clock_gettime64}
 expands to @code{clock_gettime}.
+
+When @code{__TIMESIZE} is set to 64, @theglibc{} will also define
+the@code{__USE_TIME_BITS64} macro.  It is used by the Linux kernel ABI
+to set the expected @code{time_t} size used on some syscalls.
 
 These macros are purely internal to @theglibc{} and exist only so that
 a single definition of the 64-bit time functions can be used on both

@@ -1,5 +1,5 @@
 /* Print floating point number in hexadecimal notation according to ISO C99.
-   Copyright (C) 1997-2023 Free Software Foundation, Inc.
+   Copyright (C) 1997-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -380,7 +380,7 @@ __printf_fphex_l_buffer (struct __printf_buffer *buf, locale_t loc,
 
 
 /* The wide buffer version is implemented by translating the output of
-   the multibyte verison.  */
+   the multibyte version.  */
 
 struct __printf_buffer_fphex_to_wide
 {

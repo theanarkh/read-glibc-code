@@ -1,5 +1,5 @@
 /* Declaration of libc stubs for pthread functions.  Hurd version.
-   Copyright (C) 2003-2023 Free Software Foundation, Inc.
+   Copyright (C) 2003-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -23,16 +23,8 @@
 
 int __pthread_attr_destroy (pthread_attr_t *);
 int __pthread_attr_init (pthread_attr_t *);
-int __pthread_attr_getdetachstate (const pthread_attr_t *, int *);
-int __pthread_attr_setdetachstate (pthread_attr_t *, int);
-int __pthread_attr_getinheritsched (const pthread_attr_t *, int *);
-int __pthread_attr_setinheritsched (pthread_attr_t *, int);
-int __pthread_attr_getschedparam (const pthread_attr_t *,
-				 struct sched_param *);
 int __pthread_attr_setschedparam (pthread_attr_t *,
 				 const struct sched_param *);
-int __pthread_attr_getschedpolicy (const pthread_attr_t *, int *);
-int __pthread_attr_setschedpolicy (pthread_attr_t *, int);
 int __pthread_attr_getscope (const pthread_attr_t *, int *);
 int __pthread_attr_setscope (pthread_attr_t *, int);
 int __pthread_condattr_destroy (pthread_condattr_t *);
@@ -45,18 +37,13 @@ int __pthread_cond_signal (pthread_cond_t *);
 int __pthread_cond_wait (pthread_cond_t *, pthread_mutex_t *);
 int __pthread_cond_timedwait (pthread_cond_t *, pthread_mutex_t *,
 			     const struct timespec *);
-int __pthread_equal (pthread_t, pthread_t);
 void __pthread_exit (void *) __attribute__ ((__noreturn__));
-int __pthread_getschedparam (pthread_t, int *, struct sched_param *);
-int __pthread_setschedparam (pthread_t, int,
-			    const struct sched_param *);
 int _pthread_mutex_destroy (pthread_mutex_t *);
 int _pthread_mutex_init (pthread_mutex_t *,
 			 const pthread_mutexattr_t *);
 int __pthread_mutex_lock (pthread_mutex_t *);
 int __pthread_mutex_trylock (pthread_mutex_t *);
 int __pthread_mutex_unlock (pthread_mutex_t *);
-pthread_t __pthread_self (void);
 int __pthread_setcancelstate (int, int *);
 int __pthread_setcanceltype (int, int *);
 struct __pthread_cancelation_handler **__pthread_get_cleanup_stack (void);
@@ -79,16 +66,8 @@ struct pthread_functions
 {
   int (*ptr_pthread_attr_destroy) (pthread_attr_t *);
   int (*ptr_pthread_attr_init) (pthread_attr_t *);
-  int (*ptr_pthread_attr_getdetachstate) (const pthread_attr_t *, int *);
-  int (*ptr_pthread_attr_setdetachstate) (pthread_attr_t *, int);
-  int (*ptr_pthread_attr_getinheritsched) (const pthread_attr_t *, int *);
-  int (*ptr_pthread_attr_setinheritsched) (pthread_attr_t *, int);
-  int (*ptr_pthread_attr_getschedparam) (const pthread_attr_t *,
-					 struct sched_param *);
   int (*ptr_pthread_attr_setschedparam) (pthread_attr_t *,
 					 const struct sched_param *);
-  int (*ptr_pthread_attr_getschedpolicy) (const pthread_attr_t *, int *);
-  int (*ptr_pthread_attr_setschedpolicy) (pthread_attr_t *, int);
   int (*ptr_pthread_attr_getscope) (const pthread_attr_t *, int *);
   int (*ptr_pthread_attr_setscope) (pthread_attr_t *, int);
   int (*ptr_pthread_condattr_destroy) (pthread_condattr_t *);
@@ -101,18 +80,13 @@ struct pthread_functions
   int (*ptr_pthread_cond_wait) (pthread_cond_t *, pthread_mutex_t *);
   int (*ptr_pthread_cond_timedwait) (pthread_cond_t *, pthread_mutex_t *,
 				     const struct timespec *);
-  int (*ptr_pthread_equal) (pthread_t, pthread_t);
   void (*ptr___pthread_exit) (void *) __attribute__ ((__noreturn__));
-  int (*ptr_pthread_getschedparam) (pthread_t, int *, struct sched_param *);
-  int (*ptr_pthread_setschedparam) (pthread_t, int,
-				    const struct sched_param *);
   int (*ptr_pthread_mutex_destroy) (pthread_mutex_t *);
   int (*ptr_pthread_mutex_init) (pthread_mutex_t *,
 				 const pthread_mutexattr_t *);
   int (*ptr_pthread_mutex_lock) (pthread_mutex_t *);
   int (*ptr_pthread_mutex_trylock) (pthread_mutex_t *);
   int (*ptr_pthread_mutex_unlock) (pthread_mutex_t *);
-  pthread_t (*ptr_pthread_self) (void);
   int (*ptr___pthread_setcancelstate) (int, int *);
   int (*ptr_pthread_setcanceltype) (int, int *);
   struct __pthread_cancelation_handler **(*ptr___pthread_get_cleanup_stack) (void);

@@ -1,4 +1,4 @@
-# Copyright (C) 1996-2023 Free Software Foundation, Inc.
+# Copyright (C) 1996-2024 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 
 # The GNU C Library is free software; you can redistribute it and/or
@@ -43,4 +43,10 @@ ifeq ($(subdir),rt)
 librt-sysdep_routines += rt-unwind-resume
 librt-shared-only-routines += rt-unwind-resume
 CFLAGS-rt-unwind-resume.c += -fexceptions -fasynchronous-unwind-tables
+endif
+
+ifeq ($(subdir),sysvipc)
+sysdep_headers += bits/ipc-perm.h \
+		  bits/types/struct_msqid_ds.h \
+		  bits/types/struct_shmid_ds.h
 endif

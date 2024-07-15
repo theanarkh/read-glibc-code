@@ -1,4 +1,4 @@
-/* Copyright (C) 2009-2023 Free Software Foundation, Inc.
+/* Copyright (C) 2009-2024 Free Software Foundation, Inc.
 
    This file is part of the GNU C Library.
 
@@ -20,7 +20,7 @@
 
 #define SP_ALIGN_MASK	   ~15
 
-/* Size of an X regiser in bytes. */
+/* Size of an X register in bytes. */
 #define SZREG                8
 
 /* Size of a V register in bytes. */

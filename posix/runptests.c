@@ -1,5 +1,5 @@
 /* POSIX regex testsuite from IEEE 2003.2.
-   Copyright (C) 1998-2023 Free Software Foundation, Inc.
+   Copyright (C) 1998-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -77,7 +77,7 @@ main (int argc, char *argv[])
 	  }
 	else if (tests[cnt].start == -2)
 	  {
-	    puts ("compiling suceeds, FAIL");
+	    puts ("compiling succeeds, FAIL");
 	    errors++;
 	    continue;
 	  }

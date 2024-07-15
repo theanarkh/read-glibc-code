@@ -1,5 +1,5 @@
 /* Function exp10f vectorized with SSE4.
-   Copyright (C) 2021-2023 Free Software Foundation, Inc.
+   Copyright (C) 2021-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -63,7 +63,7 @@ ENTRY(_ZGVbN4v_exp10f_sse4)
 	cfi_def_cfa_offset(80)
 	movaps	%xmm0, %xmm4
 
-	/*  Load arument  */
+	/*  Load argument  */
 	movups	_sLg2_10+__svml_sexp10_data_internal(%rip), %xmm2
 	lea	__svml_sexp10_data_internal(%rip), %r8
 	mulps	%xmm4, %xmm2
@@ -212,7 +212,7 @@ L(SPECIAL_VALUES_LOOP):
 	cfi_offset(14, -80)
 	# LOE rbx rbp r12 r13 r14 r15 xmm0
 
-	/* Scalar math fucntion call
+	/* Scalar math function call
 	 * to process special input
 	 */
 

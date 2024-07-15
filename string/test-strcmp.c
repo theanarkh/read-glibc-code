@@ -1,5 +1,5 @@
 /* Test and measure strcmp and wcscmp functions.
-   Copyright (C) 1999-2023 Free Software Foundation, Inc.
+   Copyright (C) 1999-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -48,7 +48,7 @@
 # define CHAR__MIN WCHAR_MIN
 
 /* Wcscmp uses signed semantics for comparison, not unsigned */
-/* Avoid using substraction since possible overflow */
+/* Avoid using subtraction since possible overflow */
 
 int
 simple_wcscmp (const wchar_t *s1, const wchar_t *s2)

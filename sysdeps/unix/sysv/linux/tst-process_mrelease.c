@@ -1,5 +1,5 @@
 /* Basic tests for Linux process_mrelease.
-   Copyright (C) 2022-2023 Free Software Foundation, Inc.
+   Copyright (C) 2022-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -61,7 +61,7 @@ do_test (void)
   int pidfd = pidfd_open (pid, 0);
   TEST_VERIFY (pidfd != -1);
 
-  /* The syscall only succeedes if the target process is exiting and there
+  /* The syscall only succeeds if the target process is exiting and there
      is no guarantee that calling if after pidfd_send_signal will not error
      (ince the process might have already been reaped by the OS).  So just
      check if it does fail when the process is stll running.  */

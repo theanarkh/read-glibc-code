@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2023 Free Software Foundation, Inc.
+/* Copyright (C) 2003-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -83,8 +83,6 @@ tf_body (void)
       puts ("read succeeded");
       exit (1);
     }
-
-  read (fd[0], &c, 1);
 
   pthread_cleanup_pop (0);
 }

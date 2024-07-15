@@ -1,5 +1,5 @@
 /* Measure STRLEN functions.
-   Copyright (C) 2013-2023 Free Software Foundation, Inc.
+   Copyright (C) 2013-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -48,7 +48,7 @@ IMPL (STRLEN, 1)
 static void
 do_one_test (json_ctx_t *json_ctx, impl_t *impl, const CHAR *s, size_t exp_len)
 {
-  size_t len = CALL (impl, s), i, iters = INNER_LOOP_ITERS8;
+  size_t len = CALL (impl, s), i, iters = INNER_LOOP_ITERS_LARGE;
   timing_t start, stop, cur;
 
   if (len != exp_len)

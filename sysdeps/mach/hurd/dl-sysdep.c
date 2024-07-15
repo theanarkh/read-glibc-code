@@ -1,5 +1,5 @@
 /* Operating system support for run-time dynamic linker.  Hurd version.
-   Copyright (C) 1995-2023 Free Software Foundation, Inc.
+   Copyright (C) 1995-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -32,7 +32,6 @@
 #include <sysdep.h>
 #include <argz.h>
 #include <mach/mig_support.h>
-#include <mach/machine/vm_param.h>
 #include "hurdstartup.h"
 #include <hurd/lookup.h>
 #include <hurd/auth.h>
@@ -238,7 +237,7 @@ _dl_sysdep_start_cleanup (void)
   /* Deallocate the reply port and task port rights acquired by
      __mach_init.  We are done with them now, and the user will
      reacquire them for himself when he wants them.  */
-  __mig_dealloc_reply_port (MACH_PORT_NULL);
+  __mig_dealloc_reply_port (__mig_get_reply_port ());
   __mach_port_deallocate (__mach_task_self (), __mach_host_self_);
   __mach_port_deallocate (__mach_task_self (), __mach_task_self_);
 }
@@ -285,12 +284,11 @@ open_file (const char *file_name, int flags,
 				MACH_PORT_RIGHT_SEND, +1);
 	  return _dl_hurd_data->dtable[fd];
 	}
-      errno = EBADF;
-      return MACH_PORT_NULL;
+      return __hurd_fail (EBADF), MACH_PORT_NULL;
     }
 
-  assert (!(flags & ~(O_READ | O_EXEC | O_CLOEXEC)));
-  flags &= ~O_CLOEXEC;
+  assert (!(flags & ~(O_READ | O_EXEC | O_CLOEXEC | O_IGNORE_CTTY)));
+  flags &= ~(O_CLOEXEC | O_IGNORE_CTTY);
 
   startdir = _dl_hurd_data->portarray[file_name[0] == '/'
 				      ? INIT_PORT_CRDIR : INIT_PORT_CWDIR];
@@ -304,7 +302,7 @@ open_file (const char *file_name, int flags,
   if (!err)
     err = __hurd_file_name_lookup_retry (use_init_port, get_dtable_port,
 					 __dir_lookup, doretry, retryname,
-					 O_RDONLY, 0, port);
+					 flags, 0, port);
   if (!err && stat)
     {
       err = __io_stat (*port, stat);
@@ -403,10 +401,7 @@ __ssize_t weak_function
 __writev (int fd, const struct iovec *iov, int niov)
 {
   if (fd >= _hurd_init_dtablesize)
-    {
-      errno = EBADF;
-      return -1;
-    }
+    return __hurd_fail (EBADF);
 
   int i;
   size_t total = 0;
@@ -451,7 +446,7 @@ __mmap (void *addr, size_t len, int prot, int flags, int fd, off_t offset)
 {
   error_t err;
   vm_prot_t vmprot;
-  vm_address_t mapaddr;
+  vm_address_t mapaddr, mask;
   mach_port_t memobj_rd, memobj_wr;
 
   vmprot = VM_PROT_NONE;
@@ -462,6 +457,13 @@ __mmap (void *addr, size_t len, int prot, int flags, int fd, off_t offset)
   if (prot & PROT_EXEC)
     vmprot |= VM_PROT_EXECUTE;
 
+#ifdef __x86_64__
+  if ((addr == NULL) && (prot & PROT_EXEC)
+      && HAS_ARCH_FEATURE (Prefer_MAP_32BIT_EXEC))
+    flags |= MAP_32BIT;
+#endif
+  mask = (flags & MAP_32BIT) ? ~(vm_address_t) 0x7FFFFFFF : 0;
+
   if (flags & MAP_ANON)
     memobj_rd = MACH_PORT_NULL;
   else
@@ -470,13 +472,13 @@ __mmap (void *addr, size_t len, int prot, int flags, int fd, off_t offset)
       err = __io_map ((mach_port_t) fd, &memobj_rd, &memobj_wr);
       if (err)
 	return __hurd_fail (err), MAP_FAILED;
-      if (memobj_wr != MACH_PORT_NULL)
+      if (MACH_PORT_VALID (memobj_wr))
 	__mach_port_deallocate (__mach_task_self (), memobj_wr);
     }
 
   mapaddr = (vm_address_t) addr;
   err = __vm_map (__mach_task_self (),
-		  &mapaddr, (vm_size_t) len, 0,
+		  &mapaddr, (vm_size_t) len, mask,
 		  !(flags & MAP_FIXED),
 		  memobj_rd,
 		  (vm_offset_t) offset,
@@ -491,7 +493,7 @@ __mmap (void *addr, size_t len, int prot, int flags, int fd, off_t offset)
       if (! err)
 	err = __vm_map (__mach_task_self (),
 			&mapaddr, (vm_size_t) len,
-			0,
+			mask,
 			!(flags & MAP_FIXED),
 			memobj_rd, (vm_offset_t) offset,
 			flags & (MAP_COPY|MAP_PRIVATE),
@@ -539,22 +541,14 @@ __stat64 (const char *file, struct stat64 *buf)
 }
 libc_hidden_def (__stat64)
 
-/* This function is called by the dynamic linker (rtld.c) to check
-   whether debugging malloc is allowed even for SUID binaries.  This
-   stub will always fail, which means that malloc-debugging is always
-   disabled for SUID binaries.  */
+/* This function is called by the dynamic linker (rtld.c) to check for
+   existence of /etc/ld.so.preload.  This stub will always fail, which
+   means that /etc/ld.so.preload is unsupported.  */
 check_no_hidden(__access);
 int weak_function
 __access (const char *file, int type)
 {
-  errno = ENOSYS;
-  return -1;
-}
-check_no_hidden(__access_noerrno);
-int weak_function
-__access_noerrno (const char *file, int type)
-{
-  return -1;
+  return __hurd_fail (ENOSYS);
 }
 
 int
@@ -690,8 +684,7 @@ check_no_hidden(__getcwd);
 char *weak_function
 __getcwd (char *buf, size_t size)
 {
-  errno = ENOSYS;
-  return NULL;
+  return __hurd_fail (ENOSYS), NULL;
 }
 
 /* This is used by dl-tunables.c to strdup strings.  We can just make this a

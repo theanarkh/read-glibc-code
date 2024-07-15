@@ -1,5 +1,5 @@
 /* Support file for atexit/exit, etc. race tests (BZ #27749).
-   Copyright (C) 2023 Free Software Foundation, Inc.
+   Copyright (C) 2023-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -16,7 +16,7 @@
    License along with the GNU C Library; if not, see
    <https://www.gnu.org/licenses/>.  */
 
-/* Check that atexit handler registed from another handler still called. */
+/* Check that atexit handler registered from another handler still called. */
 
 #include <stdio.h>
 #include <stdlib.h>

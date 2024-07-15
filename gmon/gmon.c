@@ -46,10 +46,8 @@
 #include <libc-internal.h>
 #include <not-cancel.h>
 
-#if HAVE_TUNABLES
-# define TUNABLE_NAMESPACE gmon
-# include <elf/dl-tunables.h>
-#endif
+#define TUNABLE_NAMESPACE gmon
+#include <elf/dl-tunables.h>
 
 #ifdef PIC
 # include <link.h>
@@ -130,7 +128,6 @@ __monstartup (u_long lowpc, u_long highpc)
   struct gmonparam *p = &_gmonparam;
   long int minarcs, maxarcs;
 
-#if HAVE_TUNABLES
   /* Read minarcs/maxarcs tunables. */
   minarcs = TUNABLE_GET (minarcs, int32_t, NULL);
   maxarcs = TUNABLE_GET (maxarcs, int32_t, NULL);
@@ -139,11 +136,6 @@ __monstartup (u_long lowpc, u_long highpc)
       ERR("monstartup: maxarcs < minarcs, setting maxarcs = minarcs\n");
       maxarcs = minarcs;
     }
-#else
-  /* No tunables, we use hardcoded defaults */
-  minarcs = MINARCS;
-  maxarcs = MAXARCS;
-#endif
 
   /*
    * If we are incorrectly called twice in a row (without an
@@ -392,13 +384,14 @@ write_gmon (void)
 	size_t len = strlen (env);
 	char buf[len + 20];
 	__snprintf (buf, sizeof (buf), "%s.%u", env, __getpid ());
-	fd = __open_nocancel (buf, O_CREAT|O_TRUNC|O_WRONLY|O_NOFOLLOW, 0666);
+	fd = __open_nocancel (buf, O_CREAT | O_TRUNC | O_WRONLY | O_NOFOLLOW
+			      | O_CLOEXEC, 0666);
       }
 
     if (fd == -1)
       {
-	fd = __open_nocancel ("gmon.out", O_CREAT|O_TRUNC|O_WRONLY|O_NOFOLLOW,
-			      0666);
+	fd = __open_nocancel ("gmon.out", O_CREAT | O_TRUNC | O_WRONLY
+			      | O_NOFOLLOW | O_CLOEXEC, 0666);
 	if (fd < 0)
 	  {
 	    char buf[300];
@@ -446,6 +439,7 @@ write_gmon (void)
 }
 
 
+#ifdef PROF
 void
 __write_profiling (void)
 {
@@ -455,7 +449,7 @@ __write_profiling (void)
     write_gmon ();
   _gmonparam.state = save;
 }
-#ifndef SHARED
+
 /* This symbol isn't used anywhere in the DSO and it is not exported.
    This would normally mean it should be removed to get the same API
    in static libraries.  But since profiling is special in static libs

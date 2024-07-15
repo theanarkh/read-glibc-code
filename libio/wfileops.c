@@ -1,4 +1,4 @@
-/* Copyright (C) 1993-2023 Free Software Foundation, Inc.
+/* Copyright (C) 1993-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -55,7 +55,7 @@ _IO_wdo_write (FILE *fp, const wchar_t *data, size_t to_do)
 	  char mb_buf[MB_LEN_MAX];
 	  char *write_base, *write_ptr, *buf_end;
 
-	  if (fp->_IO_write_ptr - fp->_IO_write_base < sizeof (mb_buf))
+	  if (fp->_IO_buf_end - fp->_IO_write_ptr < sizeof (mb_buf))
 	    {
 	      /* Make sure we have room for at least one multibyte
 		 character.  */
@@ -328,7 +328,7 @@ _IO_wfile_underflow (FILE *fp)
 libc_hidden_def (_IO_wfile_underflow)
 
 
-static wint_t
+wint_t
 _IO_wfile_underflow_mmap (FILE *fp)
 {
   struct _IO_codecvt *cd;
@@ -389,7 +389,7 @@ _IO_wfile_underflow_mmap (FILE *fp)
   return WEOF;
 }
 
-static wint_t
+wint_t
 _IO_wfile_underflow_maybe_mmap (FILE *fp)
 {
   /* This is the first read attempt.  Doing the underflow will choose mmap
@@ -1017,78 +1017,3 @@ _IO_wfile_xsputn (FILE *f, const void *data, size_t n)
   return n - to_do;
 }
 libc_hidden_def (_IO_wfile_xsputn)
-
-
-const struct _IO_jump_t _IO_wfile_jumps libio_vtable =
-{
-  JUMP_INIT_DUMMY,
-  JUMP_INIT(finish, _IO_new_file_finish),
-  JUMP_INIT(overflow, (_IO_overflow_t) _IO_wfile_overflow),
-  JUMP_INIT(underflow, (_IO_underflow_t) _IO_wfile_underflow),
-  JUMP_INIT(uflow, (_IO_underflow_t) _IO_wdefault_uflow),
-  JUMP_INIT(pbackfail, (_IO_pbackfail_t) _IO_wdefault_pbackfail),
-  JUMP_INIT(xsputn, _IO_wfile_xsputn),
-  JUMP_INIT(xsgetn, _IO_file_xsgetn),
-  JUMP_INIT(seekoff, _IO_wfile_seekoff),
-  JUMP_INIT(seekpos, _IO_default_seekpos),
-  JUMP_INIT(setbuf, _IO_new_file_setbuf),
-  JUMP_INIT(sync, (_IO_sync_t) _IO_wfile_sync),
-  JUMP_INIT(doallocate, _IO_wfile_doallocate),
-  JUMP_INIT(read, _IO_file_read),
-  JUMP_INIT(write, _IO_new_file_write),
-  JUMP_INIT(seek, _IO_file_seek),
-  JUMP_INIT(close, _IO_file_close),
-  JUMP_INIT(stat, _IO_file_stat),
-  JUMP_INIT(showmanyc, _IO_default_showmanyc),
-  JUMP_INIT(imbue, _IO_default_imbue)
-};
-libc_hidden_data_def (_IO_wfile_jumps)
-
-
-const struct _IO_jump_t _IO_wfile_jumps_mmap libio_vtable =
-{
-  JUMP_INIT_DUMMY,
-  JUMP_INIT(finish, _IO_new_file_finish),
-  JUMP_INIT(overflow, (_IO_overflow_t) _IO_wfile_overflow),
-  JUMP_INIT(underflow, (_IO_underflow_t) _IO_wfile_underflow_mmap),
-  JUMP_INIT(uflow, (_IO_underflow_t) _IO_wdefault_uflow),
-  JUMP_INIT(pbackfail, (_IO_pbackfail_t) _IO_wdefault_pbackfail),
-  JUMP_INIT(xsputn, _IO_wfile_xsputn),
-  JUMP_INIT(xsgetn, _IO_file_xsgetn),
-  JUMP_INIT(seekoff, _IO_wfile_seekoff),
-  JUMP_INIT(seekpos, _IO_default_seekpos),
-  JUMP_INIT(setbuf, _IO_file_setbuf_mmap),
-  JUMP_INIT(sync, (_IO_sync_t) _IO_wfile_sync),
-  JUMP_INIT(doallocate, _IO_wfile_doallocate),
-  JUMP_INIT(read, _IO_file_read),
-  JUMP_INIT(write, _IO_new_file_write),
-  JUMP_INIT(seek, _IO_file_seek),
-  JUMP_INIT(close, _IO_file_close_mmap),
-  JUMP_INIT(stat, _IO_file_stat),
-  JUMP_INIT(showmanyc, _IO_default_showmanyc),
-  JUMP_INIT(imbue, _IO_default_imbue)
-};
-
-const struct _IO_jump_t _IO_wfile_jumps_maybe_mmap libio_vtable =
-{
-  JUMP_INIT_DUMMY,
-  JUMP_INIT(finish, _IO_new_file_finish),
-  JUMP_INIT(overflow, (_IO_overflow_t) _IO_wfile_overflow),
-  JUMP_INIT(underflow, (_IO_underflow_t) _IO_wfile_underflow_maybe_mmap),
-  JUMP_INIT(uflow, (_IO_underflow_t) _IO_wdefault_uflow),
-  JUMP_INIT(pbackfail, (_IO_pbackfail_t) _IO_wdefault_pbackfail),
-  JUMP_INIT(xsputn, _IO_wfile_xsputn),
-  JUMP_INIT(xsgetn, _IO_file_xsgetn),
-  JUMP_INIT(seekoff, _IO_wfile_seekoff),
-  JUMP_INIT(seekpos, _IO_default_seekpos),
-  JUMP_INIT(setbuf, _IO_file_setbuf_mmap),
-  JUMP_INIT(sync, (_IO_sync_t) _IO_wfile_sync),
-  JUMP_INIT(doallocate, _IO_wfile_doallocate),
-  JUMP_INIT(read, _IO_file_read),
-  JUMP_INIT(write, _IO_new_file_write),
-  JUMP_INIT(seek, _IO_file_seek),
-  JUMP_INIT(close, _IO_file_close),
-  JUMP_INIT(stat, _IO_file_stat),
-  JUMP_INIT(showmanyc, _IO_default_showmanyc),
-  JUMP_INIT(imbue, _IO_default_imbue)
-};

@@ -1,4 +1,4 @@
-/* Copyright (C) 2002-2023 Free Software Foundation, Inc.
+/* Copyright (C) 2002-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -1009,7 +1009,8 @@ tf_pread (void *arg)
   pthread_cleanup_push (cl, NULL);
 
   char mem[10];
-  pread (tempfd, mem, sizeof (mem), 0);
+  if (pread (tempfd, mem, sizeof (mem), 0) < 0)
+    FAIL_EXIT1 ("pread failed: %m");
 
   pthread_cleanup_pop (0);
 
@@ -1038,7 +1039,8 @@ tf_pwrite (void *arg)
   pthread_cleanup_push (cl, NULL);
 
   char mem[10];
-  pwrite (tempfd, mem, sizeof (mem), 0);
+  if (pwrite (tempfd, mem, sizeof (mem), 0) <0)
+    FAIL_EXIT1 ("pwrite failed: %m");
 
   pthread_cleanup_pop (0);
 

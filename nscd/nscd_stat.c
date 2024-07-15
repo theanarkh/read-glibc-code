@@ -1,4 +1,4 @@
-/* Copyright (c) 1998-2023 Free Software Foundation, Inc.
+/* Copyright (c) 1998-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -275,7 +275,7 @@ receive_print_stats (void)
       if (enabled[0] == '\0')
 	/* The locale does not provide this information so we have to
 	   translate it ourself.  Since we should avoid short translation
-	   terms we artifically increase the length.  */
+	   terms we artificially increase the length.  */
 	enabled = data.dbs[i].enabled ? yesstr : nostr;
       if (check_file[0] == '\0')
 	check_file = data.dbs[i].check_file ? yesstr : nostr;

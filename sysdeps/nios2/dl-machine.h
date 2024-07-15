@@ -1,5 +1,5 @@
 /* Machine-dependent ELF dynamic relocation inline functions.  Nios II version.
-   Copyright (C) 1995-2023 Free Software Foundation, Inc.
+   Copyright (C) 1995-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -137,7 +137,7 @@ _start:\n\
         ldw r2, %got(_dl_argc)(r22)\n\
 	ldw r5, 0(r2)\n\
 \n\
-        /* Load adjsuted argv.  */\n\
+        /* Load adjusted argv.  */\n\
         ldw r2, %got(_dl_argv)(r22)\n\
 	ldw r6, 0(r2)\n\
 \n\

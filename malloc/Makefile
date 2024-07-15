@@ -1,4 +1,4 @@
-# Copyright (C) 1991-2023 Free Software Foundation, Inc.
+# Copyright (C) 1991-2024 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 
 # The GNU C Library is free software; you can redistribute it and/or
@@ -24,55 +24,95 @@ include ../Makeconfig
 
 dist-headers := malloc.h
 headers := $(dist-headers) obstack.h mcheck.h
-tests := mallocbug tst-malloc tst-valloc tst-calloc tst-obstack \
-	 tst-malloc-check tst-mallocfork tst-trim1 \
-	 tst-malloc-usable tst-realloc tst-reallocarray tst-posix_memalign \
-	 tst-pvalloc tst-pvalloc-fortify tst-memalign tst-mallopt \
-	 tst-malloc-backtrace tst-malloc-thread-exit \
-	 tst-malloc-thread-fail tst-malloc-fork-deadlock \
-	 tst-mallocfork2 \
-	 tst-mallocfork3 \
-	 tst-interpose-nothread \
-	 tst-interpose-thread \
-	 tst-alloc_buffer \
-	 tst-free-errno \
-	 tst-malloc-tcache-leak \
-	 tst-malloc_info tst-mallinfo2 \
-	 tst-malloc-too-large \
-	 tst-malloc-stats-cancellation \
-	 tst-tcfree1 tst-tcfree2 tst-tcfree3 \
-	 tst-safe-linking \
-	 tst-mallocalign1 \
+tests := \
+  mallocbug \
+  tst-aligned-alloc \
+  tst-aligned-alloc-random \
+  tst-alloc_buffer \
+  tst-calloc \
+  tst-free-errno \
+  tst-interpose-nothread \
+  tst-interpose-thread \
+  tst-malloc \
+  tst-malloc-alternate-path \
+  tst-malloc-backtrace \
+  tst-malloc-check \
+  tst-malloc-fork-deadlock \
+  tst-malloc-random \
+  tst-malloc-stats-cancellation \
+  tst-malloc-tcache-leak \
+  tst-malloc-thread-exit \
+  tst-malloc-thread-fail \
+  tst-malloc-too-large \
+  tst-malloc-usable \
+  tst-malloc_info tst-mallinfo2 \
+  tst-mallocalign1 \
+  tst-mallocfork \
+  tst-mallocfork2 \
+  tst-mallocfork3 \
+  tst-mallopt \
+  tst-memalign \
+  tst-memalign-2 \
+  tst-memalign-3 \
+  tst-obstack \
+  tst-posix_memalign \
+  tst-pvalloc \
+  tst-pvalloc-fortify \
+  tst-realloc \
+  tst-reallocarray \
+  tst-safe-linking \
+  tst-tcfree1 tst-tcfree2 tst-tcfree3 \
+  tst-trim1 \
+  tst-valloc \
+# tests
 
 tests-static := \
-	 tst-interpose-static-nothread \
-	 tst-interpose-static-thread
+  tst-aligned-alloc-static \
+  tst-interpose-static-nothread \
+  tst-interpose-static-thread \
+# tests-static
 
 # Test for the malloc_set_state symbol removed in glibc 2.25.
 ifeq ($(have-GLIBC_2.23)$(build-shared),yesyes)
-tests += tst-mallocstate tst-compathooks-off tst-compathooks-on
+tests += \
+  tst-compathooks-off \
+  tst-compathooks-on \
+  tst-mallocstate \
+# tests
 endif
 
 tests-internal := tst-scratch_buffer
 
 # The dynarray framework is only available inside glibc.
 tests-internal += \
-	 tst-dynarray \
-	 tst-dynarray-fail \
-	 tst-dynarray-at-fail \
+  tst-dynarray \
+  tst-dynarray-at-fail \
+  tst-dynarray-fail \
+# tests-internal
 
-ifneq (no,$(have-tunables))
-tests += tst-malloc-usable-tunables tst-mxfast
-endif
+tests += \
+  tst-malloc-usable-tunables \
+  tst-mxfast \
+# tests
 
 tests += $(tests-static)
 test-srcs = tst-mtrace
 
 # These tests either are run with MALLOC_CHECK_=3 by default or do not work
 # with MALLOC_CHECK_=3 because they expect a specific failure.
-tests-exclude-malloc-check = tst-malloc-check tst-malloc-usable \
-	tst-mxfast tst-safe-linking \
-	tst-compathooks-off tst-compathooks-on
+tests-exclude-malloc-check = \
+  tst-compathooks-off \
+  tst-compathooks-on \
+  tst-malloc-check \
+  tst-malloc-tcache-leak \
+  tst-malloc-usable \
+  tst-mallocfork2 \
+  tst-mallocfork3 \
+  tst-memalign-2 \
+  tst-memalign-3 \
+  tst-mxfast \
+  tst-safe-linking \
+# tests-exclude-malloc-check
 
 # Run all tests with MALLOC_CHECK_=3
 tests-malloc-check = $(filter-out $(tests-exclude-malloc-check) \
@@ -82,15 +122,19 @@ tests-malloc-check = $(filter-out $(tests-exclude-malloc-check) \
 # the Transparent Huge Pages support (1) or automatic huge page support (2).
 # We need exclude some tests that define the ENV vars.
 tests-exclude-hugetlb1 = \
-	tst-compathooks-off \
-	tst-compathooks-on \
-	tst-interpose-nothread \
-	tst-interpose-thread \
-	tst-interpose-static-nothread \
-	tst-interpose-static-thread \
-	tst-malloc-usable \
-	tst-malloc-usable-tunables \
-	tst-mallocstate
+  tst-compathooks-off \
+  tst-compathooks-on \
+  tst-interpose-nothread \
+  tst-interpose-static-nothread \
+  tst-interpose-static-thread \
+  tst-interpose-thread \
+  tst-malloc-tcache-leak \
+  tst-malloc-usable \
+  tst-malloc-usable-tunables \
+  tst-mallocfork2 \
+  tst-mallocfork3 \
+  tst-mallocstate \
+# tests-exclude-hugetlb1
 # The tst-free-errno relies on the used malloc page size to mmap an
 # overlapping region.
 tests-exclude-hugetlb2 = \
@@ -106,18 +150,25 @@ ifeq ($(have-GLIBC_2.23)$(build-shared),yesyes)
 # Tests that don't play well with mcheck.  They are either bugs in mcheck or
 # the tests expect specific internal behavior that is changed due to linking to
 # libmcheck.a.
-tests-exclude-mcheck = tst-mallocstate \
-	tst-safe-linking \
-	tst-malloc-backtrace \
-	tst-malloc-fork-deadlock \
-	tst-malloc-stats-cancellation \
-	tst-malloc-tcache-leak \
-	tst-malloc-thread-exit \
-	tst-malloc-thread-fail \
-	tst-malloc-usable-tunables \
-	tst-malloc_info \
-	tst-compathooks-off tst-compathooks-on \
-	tst-mxfast
+tests-exclude-mcheck = \
+  tst-compathooks-off \
+  tst-compathooks-on \
+  tst-malloc-backtrace \
+  tst-malloc-fork-deadlock \
+  tst-malloc-stats-cancellation \
+  tst-malloc-tcache-leak \
+  tst-malloc-thread-exit \
+  tst-malloc-thread-fail \
+  tst-malloc-usable-tunables \
+  tst-malloc_info \
+  tst-mallocfork2 \
+  tst-mallocfork3 \
+  tst-mallocstate \
+  tst-memalign-2 \
+  tst-memalign-3 \
+  tst-mxfast \
+  tst-safe-linking \
+# tests-exclude-mcheck
 
 tests-mcheck = $(filter-out $(tests-exclude-mcheck) $(tests-static), $(tests))
 endif
@@ -145,12 +196,18 @@ extra-libs-others = $(extra-libs)
 
 # Helper objects for some tests.
 extra-test-objs += \
+  tst-aligned_alloc-lib.so \
   tst-interpose-aux-nothread.o \
   tst-interpose-aux-thread.o \
+# extra-test-objs
 
 test-extras = \
   tst-interpose-aux-nothread \
   tst-interpose-aux-thread \
+# test-extras
+
+modules-names = \
+  tst-aligned_alloc-lib
 
 libmemusage-routines = memusage
 libmemusage-inhibit-o = $(filter-out .os,$(object-suffixes))
@@ -178,14 +235,10 @@ $(objpfx)tst-malloc-fork-deadlock-malloc-check: $(shared-thread-library)
 $(objpfx)tst-malloc-stats-cancellation-malloc-check: $(shared-thread-library)
 $(objpfx)tst-malloc-thread-exit-malloc-hugetlb1: $(shared-thread-library)
 $(objpfx)tst-malloc-thread-fail-malloc-hugetlb1: $(shared-thread-library)
-$(objpfx)tst-mallocfork2-malloc-hugetlb1: $(shared-thread-library)
-$(objpfx)tst-mallocfork3-malloc-hugetlb1: $(shared-thread-library)
 $(objpfx)tst-malloc-fork-deadlock-malloc-hugetlb1: $(shared-thread-library)
 $(objpfx)tst-malloc-stats-cancellation-malloc-hugetlb1: $(shared-thread-library)
 $(objpfx)tst-malloc-thread-exit-malloc-hugetlb2: $(shared-thread-library)
 $(objpfx)tst-malloc-thread-fail-malloc-hugetlb2: $(shared-thread-library)
-$(objpfx)tst-mallocfork2-malloc-hugetlb2: $(shared-thread-library)
-$(objpfx)tst-mallocfork3-malloc-hugetlb2: $(shared-thread-library)
 $(objpfx)tst-malloc-fork-deadlock-malloc-hugetlb2: $(shared-thread-library)
 $(objpfx)tst-malloc-stats-cancellation-malloc-hugetlb2: $(shared-thread-library)
 
@@ -197,7 +250,6 @@ others-extras = mcheck-init.o
 aux := set-freeres thread-freeres
 
 # The Perl script to analyze the output of the mtrace functions.
-ifneq ($(PERL),no)
 install-bin-script = mtrace
 generated += mtrace
 
@@ -207,7 +259,6 @@ ifneq ($(findstring wordsize-32,$(config-sysdirs)),)
 address-width=10
 else
 address-width=18
-endif
 endif
 
 # Unless we get a test for the availability of libgd which also works
@@ -286,19 +337,17 @@ tst-malloc-usable-tunables-ENV = GLIBC_TUNABLES=glibc.malloc.check=3 \
 tst-mxfast-ENV = GLIBC_TUNABLES=glibc.malloc.tcache_count=0:glibc.malloc.mxfast=0
 
 CPPFLAGS-malloc-debug.c += -DUSE_TCACHE=0
-ifeq ($(experimental-malloc),yes)
 CPPFLAGS-malloc.c += -DUSE_TCACHE=1
-else
-CPPFLAGS-malloc.c += -DUSE_TCACHE=0
-endif
 # Uncomment this for test releases.  For public releases it is too expensive.
 #CPPFLAGS-malloc.o += -DMALLOC_DEBUG=1
+
+CFLAGS-tst-tcfree3.c += -fno-builtin-malloc -fno-builtin-free
 
 sLIBdir := $(shell echo $(slibdir) | sed 's,lib\(\|64\)$$,\\\\$$LIB,')
 
 $(objpfx)mtrace: mtrace.pl
 	rm -f $@.new
-	sed -e 's|@PERL@|$(PERL)|' -e 's|@XXX@|$(address-width)|' \
+	sed -e 's|@XXX@|$(address-width)|' \
 	    -e 's|@VERSION@|$(version)|' \
 	    -e 's|@PKGVERSION@|$(PKGVERSION)|' \
 	    -e 's|@REPORT_BUGS_TO@|$(REPORT_BUGS_TO)|' $^ > $@.new \
@@ -344,16 +393,14 @@ $(objpfx)tst-dynarray-fail-mem.out: $(objpfx)tst-dynarray-fail.out
 $(objpfx)tst-malloc-tcache-leak: $(shared-thread-library)
 $(objpfx)tst-malloc_info: $(shared-thread-library)
 $(objpfx)tst-mallocfork2: $(shared-thread-library)
-$(objpfx)tst-malloc-tcache-leak-mcheck: $(shared-thread-library)
 $(objpfx)tst-malloc_info-mcheck: $(shared-thread-library)
-$(objpfx)tst-mallocfork2-mcheck: $(shared-thread-library)
-$(objpfx)tst-malloc-tcache-leak-malloc-check: $(shared-thread-library)
 $(objpfx)tst-malloc_info-malloc-check: $(shared-thread-library)
 $(objpfx)tst-mallocfork2-malloc-check: $(shared-thread-library)
-$(objpfx)tst-malloc-tcache-leak-malloc-hugetlb1: $(shared-thread-library)
-$(objpfx)tst-malloc-tcache-leak-malloc-hugetlb2: $(shared-thread-library)
 $(objpfx)tst-malloc_info-malloc-hugetlb1: $(shared-thread-library)
 $(objpfx)tst-malloc_info-malloc-hugetlb2: $(shared-thread-library)
+$(objpfx)tst-memalign-3: $(shared-thread-library)
+$(objpfx)tst-memalign-3-malloc-hugetlb1: $(shared-thread-library)
+$(objpfx)tst-memalign-3-malloc-hugetlb2: $(shared-thread-library)
 
 tst-compathooks-on-ENV = LD_PRELOAD=$(objpfx)libc_malloc_debug.so
 tst-compathooks-on-mcheck-ENV = LD_PRELOAD=$(objpfx)libc_malloc_debug.so
@@ -366,3 +413,9 @@ tst-mallocstate-malloc-check-ENV = LD_PRELOAD=$(objpfx)libc_malloc_debug.so
 # libc_malloc_debug.so.
 $(objpfx)tst-mallocstate: $(objpfx)libc_malloc_debug.so
 $(objpfx)tst-mallocstate-malloc-check: $(objpfx)libc_malloc_debug.so
+
+$(objpfx)tst-aligned-alloc-random.out: $(objpfx)tst-aligned_alloc-lib.so
+$(objpfx)tst-malloc-random.out: $(objpfx)tst-aligned_alloc-lib.so
+
+tst-aligned-alloc-random-ENV = LD_PRELOAD=$(objpfx)tst-aligned_alloc-lib.so
+tst-malloc-random-ENV = LD_PRELOAD=$(objpfx)tst-aligned_alloc-lib.so

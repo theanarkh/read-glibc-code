@@ -1,5 +1,5 @@
 /* Handle faults in the signal thread.
-   Copyright (C) 1994-2023 Free Software Foundation, Inc.
+   Copyright (C) 1994-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -45,7 +45,7 @@ _hurdsig_fault_catch_exception_raise (mach_port_t port,
 				      mach_msg_type_number_t codeCnt
 #else				/* Vanilla Mach 3.0 interface.  */
 				      integer_t exception,
-				      integer_t code, integer_t subcode
+				      integer_t code, long_integer_t subcode
 #endif
 				      )
 {
@@ -115,10 +115,6 @@ _hurdsig_fault_catch_exception_raise_state_identity
 #endif
 
 
-#ifdef NDR_CHAR_ASCII		/* OSF Mach flavors have different names.  */
-# define mig_reply_header_t	mig_reply_error_t
-#endif
-
 static void
 faulted (void)
 {
@@ -174,14 +170,14 @@ _hurdsig_fault_init (void)
   err = __mach_port_allocate (__mach_task_self (),
 			      MACH_PORT_RIGHT_RECEIVE, &sigexc);
   assert_perror (err);
-  err = __mach_port_allocate (__mach_task_self (),
-			      MACH_PORT_RIGHT_RECEIVE, &forward_sigexc);
+  err = __mach_port_insert_right (__mach_task_self (), sigexc,
+				  sigexc, MACH_MSG_TYPE_MAKE_SEND);
   assert_perror (err);
 
   /* Allocate a port to receive the exception msgs forwarded
      from the proc server.  */
-  err = __mach_port_insert_right (__mach_task_self (), sigexc,
-				  sigexc, MACH_MSG_TYPE_MAKE_SEND);
+  err = __mach_port_allocate (__mach_task_self (),
+			      MACH_PORT_RIGHT_RECEIVE, &forward_sigexc);
   assert_perror (err);
 
   /* Set the queue limit for this port to just one.  The proc server will
@@ -205,8 +201,8 @@ _hurdsig_fault_init (void)
      It runs the function above.  */
   memset (&state, 0, sizeof state);
   MACHINE_THREAD_STATE_FIX_NEW (&state);
-  MACHINE_THREAD_STATE_SET_PC (&state, faulted);
-  MACHINE_THREAD_STATE_SET_SP (&state, faultstack, sizeof faultstack);
+  MACHINE_THREAD_STATE_SETUP_CALL (&state, faultstack,
+				   sizeof faultstack, faulted);
 
   err = __USEPORT
     (PROC,

@@ -1,5 +1,5 @@
 /* unlinkat -- Remove a name relative to an open directory.  Hurd version.
-   Copyright (C) 2006-2023 Free Software Foundation, Inc.
+   Copyright (C) 2006-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -33,10 +33,7 @@ __unlinkat (int fd, const char *name, int flag)
   const char *file;
 
   if ((flag &~ AT_REMOVEDIR) != 0)
-    {
-      __set_errno (EINVAL);
-      return -1;
-    }
+    return __hurd_fail (EINVAL);
 
   dir = __directory_name_split_at (fd, name, (char **) &file);
   if (dir == MACH_PORT_NULL)

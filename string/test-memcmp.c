@@ -1,5 +1,5 @@
 /* Test and measure memcmp functions.
-   Copyright (C) 1999-2023 Free Software Foundation, Inc.
+   Copyright (C) 1999-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -45,7 +45,7 @@ SIMPLE_MEMCMP (const wchar_t *s1, const wchar_t *s2, size_t n)
   int ret = 0;
   /* Warning!
 	wmemcmp has to use SIGNED comparison for elements.
-	memcmp has to use UNSIGNED comparison for elemnts.
+	memcmp has to use UNSIGNED comparison for elements.
   */
   while (n-- && (ret = *s1 < *s2 ? -1 : *s1 == *s2 ? 0 : 1) == 0) {s1++; s2++;}
   return ret;

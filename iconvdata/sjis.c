@@ -1,5 +1,5 @@
 /* Mapping tables for SJIS handling.
-   Copyright (C) 1997-2023 Free Software Foundation, Inc.
+   Copyright (C) 1997-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -2001,7 +2001,7 @@ static const char from_ucs4_greek[193][2] =
 
 
 /* The mapping of the Kanji is horrible.  The glyphs covered by Shift JIS
-   are spreaded all around the Unicode CJK area.  We use one big table
+   are spread all around the Unicode CJK area.  We use one big table
    since using the gaps will not buy us much.
 
    The following table can be generated using

@@ -1,5 +1,5 @@
 /* System-specific socket constants and types.  Hurd version.
-   Copyright (C) 1991-2023 Free Software Foundation, Inc.
+   Copyright (C) 1991-2024 Free Software Foundation, Inc.
 
    This file is part of the GNU C Library.
 
@@ -153,7 +153,7 @@ enum __socket_type
 #include <bits/sockaddr.h>
 
 /* Structure describing a generic socket address.  */
-struct sockaddr
+struct __attribute_struct_may_alias__ sockaddr
   {
     __SOCKADDR_COMMON (sa_);	/* Common data: address family and length.  */
     char sa_data[14];		/* Address data.  */
@@ -170,7 +170,7 @@ struct sockaddr
 #define _SS_PADSIZE \
   (_SS_SIZE - __SOCKADDR_COMMON_SIZE - sizeof (__ss_aligntype))
 
-struct sockaddr_storage
+struct __attribute_struct_may_alias__ sockaddr_storage
   {
     __SOCKADDR_COMMON (ss_);	/* Address family, etc.  */
     char __ss_padding[_SS_PADSIZE];
@@ -197,8 +197,11 @@ enum
 #define MSG_WAITALL MSG_WAITALL
     MSG_DONTWAIT	= 0x80,	/* This message should be nonblocking.  */
 #define MSG_DONTWAIT MSG_DONTWAIT
-    MSG_NOSIGNAL	= 0x0400	/* Do not generate SIGPIPE on EPIPE.  */
+    MSG_NOSIGNAL	= 0x0400,	/* Do not generate SIGPIPE on EPIPE.  */
 #define MSG_NOSIGNAL MSG_NOSIGNAL
+    MSG_CMSG_CLOEXEC	= 0x40000	/* Atomically set close-on-exec flag
+					   for file descriptors in SCM_RIGHTS.  */
+#define MSG_CMSG_CLOEXEC MSG_CMSG_CLOEXEC
   };
 
 

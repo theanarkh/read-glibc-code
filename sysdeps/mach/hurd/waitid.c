@@ -1,5 +1,5 @@
 /* Implementation of waitid.  Hurd version.
-   Copyright (C) 1997-2023 Free Software Foundation, Inc.
+   Copyright (C) 1997-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -52,8 +52,7 @@ __waitid (idtype_t idtype, id_t id, siginfo_t *infop, int options)
       break;
     default:
     invalid:
-      __set_errno (EINVAL);
-      return -1;
+      return __hurd_fail (EINVAL);
     }
 
   /* Technically we're supposed to return EFAULT if infop is bogus,
@@ -62,10 +61,7 @@ __waitid (idtype_t idtype, id_t id, siginfo_t *infop, int options)
      We just check for a null pointer. */
 
   if (infop == NULL)
-    {
-      __set_errno (EFAULT);
-      return -1;
-    }
+    return __hurd_fail (EFAULT);
 
   cancel_oldtype = LIBC_CANCEL_ASYNC();
 #if HURD_INTERFACE_VERSION >= 20201227

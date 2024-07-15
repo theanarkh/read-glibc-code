@@ -1,4 +1,4 @@
-/* Copyright (C) 2004-2023 Free Software Foundation, Inc.
+/* Copyright (C) 2004-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -20,6 +20,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <support/xunistd.h>
+
 
 static void *
 tf (void *arg)
@@ -32,7 +34,7 @@ tf (void *arg)
     }
 
   char buf[10];
-  read (fds[0], buf, sizeof (buf));
+  xread (fds[0], buf, sizeof (buf));
 
   puts ("read returned");
   exit (1);

@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2023 Free Software Foundation, Inc.
+/* Copyright (C) 2003-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -31,10 +31,12 @@ eintr_handler (int sig)
 {
   if (sig != the_sig)
     {
-      write (STDOUT_FILENO, "eintr_handler: signal number wrong\n", 35);
+      /* empty if statement avoids warn unused result */
+      if (write (STDOUT_FILENO,
+		 "eintr_handler: signal number wrong\n", 35) < 35) {};
       _exit (1);
     }
-  write (STDOUT_FILENO, ".", 1);
+  if (write (STDOUT_FILENO, ".", 1)) {/* Avoid warn unused result */};
 }
 
 

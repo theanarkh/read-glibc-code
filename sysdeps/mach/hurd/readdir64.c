@@ -1,4 +1,4 @@
-/* Copyright (C) 2001-2023 Free Software Foundation, Inc.
+/* Copyright (C) 2001-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -29,10 +29,7 @@ __readdir64 (DIR *dirp)
   struct dirent64 *dp;
 
   if (dirp == NULL)
-    {
-      errno = EINVAL;
-      return NULL;
-    }
+    return __hurd_fail (EINVAL), NULL;
 
   __libc_lock_lock (dirp->__lock);
 
@@ -67,9 +64,13 @@ __readdir64 (DIR *dirp)
 	      /* The data was passed out of line, so our old buffer is no
 		 longer useful.  Deallocate the old buffer and reset our
 		 information for the new buffer.  */
-	      __vm_deallocate (__mach_task_self (),
-			       (vm_address_t) dirp->__data,
-			       dirp->__allocation);
+	      if (dirp->__data != NULL)
+		{
+		  err = __vm_deallocate (__mach_task_self (),
+					 (vm_address_t) dirp->__data,
+					 dirp->__allocation);
+		  assert_perror (err);
+		}
 	      dirp->__data = data;
 	      dirp->__allocation = round_page (dirp->__size);
 	    }

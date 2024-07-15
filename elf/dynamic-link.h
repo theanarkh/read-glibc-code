@@ -1,5 +1,5 @@
 /* Inline functions for dynamic linking.
-   Copyright (C) 1995-2023 Free Software Foundation, Inc.
+   Copyright (C) 1995-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -73,7 +73,7 @@ elf_machine_lazy_rel (struct link_map *map, struct r_scope_elem *scope[],
 /* On some machines, notably SPARC, DT_REL* includes DT_JMPREL in its
    range.  Note that according to the ELF spec, this is completely legal!
 
-   We are guarenteed that we have one of three situations.  Either DT_JMPREL
+   We are guaranteed that we have one of three situations.  Either DT_JMPREL
    comes immediately after DT_REL*, or there is overlap and DT_JMPREL
    consumes precisely the very end of the DT_REL*, or DT_JMPREL and DT_REL*
    are completely separate and there is a gap between them.  */
@@ -177,6 +177,10 @@ elf_machine_lazy_rel (struct link_map *map, struct r_scope_elem *scope[],
       }									      \
   } while (0);
 
+# ifndef ELF_DYNAMIC_AFTER_RELOC
+#  define ELF_DYNAMIC_AFTER_RELOC(map, lazy)
+# endif
+
 /* This can't just be an inline function because GCC is too dumb
    to inline functions containing inlines themselves.  */
 # ifdef RTLD_BOOTSTRAP
@@ -192,6 +196,7 @@ elf_machine_lazy_rel (struct link_map *map, struct r_scope_elem *scope[],
       ELF_DYNAMIC_DO_RELR (map);					      \
     ELF_DYNAMIC_DO_REL ((map), (scope), edr_lazy, skip_ifunc);		      \
     ELF_DYNAMIC_DO_RELA ((map), (scope), edr_lazy, skip_ifunc);		      \
+    ELF_DYNAMIC_AFTER_RELOC ((map), (edr_lazy));			      \
   } while (0)
 
 #endif

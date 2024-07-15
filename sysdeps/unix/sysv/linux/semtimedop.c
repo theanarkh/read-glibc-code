@@ -1,4 +1,4 @@
-/* Copyright (C) 1995-2023 Free Software Foundation, Inc.
+/* Copyright (C) 1995-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -34,7 +34,7 @@ semtimedop_syscall (int semid, struct sembuf *sops, size_t nsops,
 #endif
 }
 
-/* Perform user-defined atomical operation of array of semaphores.  */
+/* Perform user-defined atomic operation of array of semaphores.  */
 int
 __semtimedop64 (int semid, struct sembuf *sops, size_t nsops,
 		const struct __timespec64 *timeout)

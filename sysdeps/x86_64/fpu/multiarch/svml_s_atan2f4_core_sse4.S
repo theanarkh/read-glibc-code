@@ -1,5 +1,5 @@
 /* Function atan2f vectorized with SSE4.
-   Copyright (C) 2021-2023 Free Software Foundation, Inc.
+   Copyright (C) 2021-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -157,11 +157,11 @@ ENTRY(_ZGVbN4vv_atan2f_sse4)
 	/*  Special branch for fast (vector) processing of zero arguments  */
 	testl	%ecx, %ecx
 
-	/* Go to auxilary branch */
+	/* Go to auxiliary branch */
 	jne	L(AUX_BRANCH)
 	# LOE rbx rbp r12 r13 r14 r15 eax edx xmm0 xmm1 xmm4 xmm5 xmm6 xmm7 xmm8 xmm9 xmm10 xmm11 xmm12 xmm13
 
-	/* Return from auxilary branch
+	/* Return from auxiliary branch
 	 * for out of main path inputs
 	 */
 
@@ -244,7 +244,7 @@ L(SPECIAL_VALUES_LOOP):
 	cfi_offset(14, -96)
 	# LOE rbx rbp r12 r13 r14 r15 xmm0
 
-	/* Scalar math fucntion call
+	/* Scalar math function call
 	 * to process special input
 	 */
 
@@ -264,7 +264,7 @@ L(SCALAR_MATH_CALL):
 	cfi_restore(14)
 	# LOE rbx rbp r15 r12d r13d
 
-	/* Auxilary branch
+	/* Auxiliary branch
 	 * for out of main path inputs
 	 */
 

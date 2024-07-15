@@ -1,4 +1,4 @@
-/* Copyright (C) 2005-2023 Free Software Foundation, Inc.
+/* Copyright (C) 2005-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -25,3 +25,4 @@ __read_chk (int fd, void *buf, size_t nbytes, size_t buflen)
 
   return __read (fd, buf, nbytes);
 }
+libc_hidden_def (__read_chk)

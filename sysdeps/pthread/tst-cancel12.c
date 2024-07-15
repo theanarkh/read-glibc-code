@@ -1,5 +1,5 @@
 /* Test sem_wait cancellation for uncontended case.
-   Copyright (C) 2003-2023 Free Software Foundation, Inc.
+   Copyright (C) 2003-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -75,7 +75,7 @@ do_test (void)
     }
 
   /* A value higher than 0 will check for uncontended pthread cancellation,
-     where the sem_wait operation will return immediatelly.  */
+     where the sem_wait operation will return immediately.  */
   if (sem_init (&sem, 0, 1) != 0)
     {
       puts ("error: sem_init failed");

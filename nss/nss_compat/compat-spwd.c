@@ -1,4 +1,4 @@
-/* Copyright (C) 1996-2023 Free Software Foundation, Inc.
+/* Copyright (C) 1996-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -387,7 +387,7 @@ getspent_next_nss (struct spwd *result, ent_t *ent,
 }
 
 
-/* This function handle the +user entrys in /etc/shadow */
+/* This function handle the +user entries in /etc/shadow */
 static enum nss_status
 getspnam_plususer (const char *name, struct spwd *result, ent_t *ent,
 		   char *buffer, size_t buflen, int *errnop)

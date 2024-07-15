@@ -1,5 +1,5 @@
 /* Support for reading ELF files.
-   Copyright (C) 2022-2023 Free Software Foundation, Inc.
+   Copyright (C) 2022-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -40,7 +40,13 @@ process_elf_file (const char *file_name, const char *lib, int *flag,
 
   ret = process_elf64_file (file_name, lib, flag, isa_level, soname,
 				file_contents, file_length);
-  flags = elf64_header->e_flags;
+
+  /* The EF_LARCH_OBJABI_V1 flag indicate which set of static relocations
+   the object might use and it only considered during static linking,
+   it does not reflect in runtime relocations.  However some binutils
+   version might set it on dynamic shared object, so clear it to avoid
+   see the SO as unsupported.  */
+  flags = elf64_header->e_flags & ~EF_LARCH_OBJABI_V1;
 
   /* LoongArch linkers encode the floating point ABI as part of the ELF headers.  */
   switch (flags & SUPPORTED_ELF_FLAGS)

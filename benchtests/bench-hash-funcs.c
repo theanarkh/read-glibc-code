@@ -1,5 +1,5 @@
 /* Measure hash functions runtime.
-   Copyright (C) 2022-2023 Free Software Foundation, Inc.
+   Copyright (C) 2022-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -42,7 +42,7 @@ enum
 {
   NFIXED_ITERS = 1048576,
   NRAND_BUFS = 16384,
-  NRAND_ITERS = 2048,
+  NRAND_ITERS = 256,
   RAND_BENCH_MAX_LEN = 128
 };
 

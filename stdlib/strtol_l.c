@@ -1,5 +1,5 @@
 /* Convert string representing a number to integer value, using given locale.
-   Copyright (C) 1997-2023 Free Software Foundation, Inc.
+   Copyright (C) 1997-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -17,8 +17,8 @@
    <https://www.gnu.org/licenses/>.  */
 
 #include <features.h>
-#undef __GLIBC_USE_C2X_STRTOL
-#define __GLIBC_USE_C2X_STRTOL 0
+#undef __GLIBC_USE_C23_STRTOL
+#define __GLIBC_USE_C23_STRTOL 0
 
 #if HAVE_CONFIG_H
 # include <config.h>
@@ -526,11 +526,15 @@ INTERNAL (__strtol_l) (const STRING_TYPE *nptr, STRING_TYPE **endptr,
 noconv:
   /* We must handle a special case here: the base is 0 or 16 and the
      first two characters are '0' and 'x', but the rest are no
-     hexadecimal digits.  This is no error case.  We return 0 and
-     ENDPTR points to the `x`.  */
+     hexadecimal digits.  Likewise when the base is 0 or 2 and the
+     first two characters are '0' and 'b', but the rest are no binary
+     digits.  This is no error case.  We return 0 and ENDPTR points to
+     the 'x' or 'b'.  */
   if (endptr != NULL)
     {
-      if (save - nptr >= 2 && TOUPPER (save[-1]) == L_('X')
+      if (save - nptr >= 2
+	  && (TOUPPER (save[-1]) == L_('X')
+	      || (bin_cst && TOUPPER (save[-1]) == L_('B')))
 	  && save[-2] == L_('0'))
 	*endptr = (STRING_TYPE *) &save[-1];
       else

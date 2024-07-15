@@ -1,5 +1,5 @@
 /* Test SIGEV_THREAD handling for POSIX message queues.
-   Copyright (C) 2004-2023 Free Software Foundation, Inc.
+   Copyright (C) 2004-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -61,13 +61,13 @@ fct (union sigval s)
   /* Check the values.  */
   if (attr.mq_maxmsg != MAXMSG)
     {
-      printf ("%s: mq_maxmsg wrong: is %jd, expecte %d\n",
+      printf ("%s: mq_maxmsg wrong: is %jd, expected %d\n",
 	      __FUNCTION__, (intmax_t) attr.mq_maxmsg, MAXMSG);
       exit (1);
     }
   if (attr.mq_msgsize != MAXMSG)
     {
-      printf ("%s: mq_msgsize wrong: is %jd, expecte %d\n",
+      printf ("%s: mq_msgsize wrong: is %jd, expected %d\n",
 	      __FUNCTION__, (intmax_t) attr.mq_msgsize, MSGSIZE);
       exit (1);
     }

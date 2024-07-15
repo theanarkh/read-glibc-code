@@ -1,5 +1,5 @@
 /* Definitions for thread-local data handling.  Hurd/x86_64 version.
-   Copyright (C) 2003-2023 Free Software Foundation, Inc.
+   Copyright (C) 2003-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -35,7 +35,7 @@ typedef struct
 {
   void *tcb;			/* Points to this structure.  */
   dtv_t *dtv;			/* Vector of pointers to TLS data.  */
-  thread_t self;		/* This thread's control port.  */
+  thread_t self_do_no_use;	/* This thread's control port.  */
   int __glibc_padding1;
   int multiple_threads;
   int gscope_flag;
@@ -68,10 +68,6 @@ _Static_assert (offsetof (tcbhead_t, stack_guard) == 0x28,
 _Static_assert (offsetof (tcbhead_t, __private_ss) == 0x70,
                 "split stack pointer offset");
 
-extern unsigned char __libc_tls_initialized;
-
-# define __LIBC_NO_TLS() __builtin_expect (!__libc_tls_initialized, 0)
-
 /* The TCB can have any size and the memory following the address the
    thread pointer points to is unspecified.  Allocate the TCB there.  */
 # define TLS_TCB_AT_TP	1
@@ -86,8 +82,6 @@ extern unsigned char __libc_tls_initialized;
    "Segment Base".)  On such machines, a cache line is 64 bytes.  */
 # define TCB_ALIGNMENT	64
 
-
-# define TLS_INIT_TP(descr) _hurd_tls_init ((tcbhead_t *) (descr))
 
 # define THREAD_SELF							\
   (*(tcbhead_t * __seg_fs *) offsetof (tcbhead_t, tcb))
@@ -138,6 +132,10 @@ THREAD_TCB (thread_t thread,
   ((descr)->pointer_guard						\
    = THREAD_GETMEM (THREAD_SELF, pointer_guard))
 
+/* From hurd.h, reproduced here to avoid a circular include.  */
+extern thread_t __hurd_thread_self (void);
+libc_hidden_proto (__hurd_thread_self)
+
 /* Set up TLS in the new thread of a fork child, copying from the original.  */
 static inline kern_return_t __attribute__ ((unused))
 _hurd_tls_fork (thread_t child, thread_t orig,
@@ -146,12 +144,24 @@ _hurd_tls_fork (thread_t child, thread_t orig,
   error_t err;
   struct i386_fsgs_base_state state;
   mach_msg_type_number_t state_count = i386_FSGS_BASE_STATE_COUNT;
-  err = __thread_get_state (orig, i386_FSGS_BASE_STATE,
-                            (thread_state_t) &state,
-                            &state_count);
-  if (err)
-    return err;
-  assert (state_count == i386_FSGS_BASE_STATE_COUNT);
+
+  if (orig != __hurd_thread_self ())
+    {
+      err = __thread_get_state (orig, i386_FSGS_BASE_STATE,
+                                (thread_state_t) &state,
+                                &state_count);
+      if (err)
+        return err;
+      assert (state_count == i386_FSGS_BASE_STATE_COUNT);
+    }
+  else
+    {
+      /* It is illegal to call thread_get_state () on mach_thread_self ().
+         But we're only interested in the value of fs_base, and since we're
+         this thread, we know it points to our TCB.  */
+      state.fs_base = (unsigned long) THREAD_SELF;
+      state.gs_base = 0;
+    }
 
   return __thread_set_state (child, i386_FSGS_BASE_STATE,
                              (thread_state_t) &state,
@@ -164,7 +174,6 @@ _hurd_tls_new (thread_t child, tcbhead_t *tcb)
   struct i386_fsgs_base_state state;
 
   tcb->tcb = tcb;
-  tcb->self = child;
 
   /* Install the TCB address into FS base.  */
   state.fs_base = (uintptr_t) tcb;
@@ -174,20 +183,39 @@ _hurd_tls_new (thread_t child, tcbhead_t *tcb)
                              i386_FSGS_BASE_STATE_COUNT);
 }
 
+# if !defined (SHARED) || IS_IN (rtld)
+extern unsigned char __libc_tls_initialized;
+#  define __LIBC_NO_TLS() __builtin_expect (!__libc_tls_initialized, 0)
+
 static inline bool __attribute__ ((unused))
-_hurd_tls_init (tcbhead_t *tcb)
+_hurd_tls_init (tcbhead_t *tcb, bool full)
 {
   error_t err;
   thread_t self = __mach_thread_self ();
+  extern mach_port_t __hurd_reply_port0;
 
   /* We always at least start the sigthread anyway.  */
   tcb->multiple_threads = 1;
+  if (full)
+    /* Take over the reply port we've been using.  */
+    tcb->reply_port = __hurd_reply_port0;
 
   err = _hurd_tls_new (self, tcb);
+  if (err == 0 && full)
+    {
+      __libc_tls_initialized = 1;
+      /* This port is now owned by the TCB.  */
+      __hurd_reply_port0 = MACH_PORT_NULL;
+    }
   __mach_port_deallocate (__mach_task_self (), self);
-  __libc_tls_initialized = 1;
   return err == 0;
 }
+
+#  define TLS_INIT_TP(descr) _hurd_tls_init ((tcbhead_t *) (descr), 1)
+# else /* defined (SHARED) && !IS_IN (rtld) */
+#  define __LIBC_NO_TLS() 0
+# endif
+
 
 
 /* Global scope switch support.  */

@@ -1,4 +1,4 @@
-# Copyright (C) 2000-2023 Free Software Foundation, Inc.
+# Copyright (C) 2000-2024 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 
 # The GNU C Library is free software; you can redistribute it and/or
@@ -30,9 +30,6 @@ endif
 ifeq ($(subdir),csu)
 ifeq (yes,$(build-shared))
 # Compatibility
-ifeq (yes,$(have-protected))
-CPPFLAGS-libgcc-compat.c = -DHAVE_DOT_HIDDEN
-endif
 sysdep_routines += libgcc-compat
 shared-only-routines += libgcc-compat
 endif

@@ -1,5 +1,5 @@
-/* Handling of dynamic sring tokens.
-   Copyright (C) 1999-2023 Free Software Foundation, Inc.
+/* Handling of dynamic string tokens.
+   Copyright (C) 1999-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or

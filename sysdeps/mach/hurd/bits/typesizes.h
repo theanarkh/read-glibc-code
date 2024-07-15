@@ -1,5 +1,5 @@
 /* bits/typesizes.h -- underlying types for *_t.  Hurd version.
-   Copyright (C) 2002-2023 Free Software Foundation, Inc.
+   Copyright (C) 2002-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -26,7 +26,7 @@
 /* See <bits/types.h> for the meaning of these macros.  This file exists so
    that <bits/types.h> need not vary across different GNU platforms.  */
 
-#define __DEV_T_TYPE		__U32_TYPE
+#define __DEV_T_TYPE		__UWORD_TYPE
 #define __UID_T_TYPE		__U32_TYPE
 #define __GID_T_TYPE		__U32_TYPE
 #define __INO_T_TYPE		__ULONGWORD_TYPE

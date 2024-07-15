@@ -1,4 +1,4 @@
-/* Copyright (C) 1991-2023 Free Software Foundation, Inc.
+/* Copyright (C) 1991-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -16,7 +16,7 @@
    <https://www.gnu.org/licenses/>.  */
 
 /* This file is intentionally left empty.  It exists so that both
-   architectures which implement __memcmpeq seperately from memcmp and
+   architectures which implement __memcmpeq separately from memcmp and
    architectures which implement __memcmpeq by having it alias memcmp will
    build.
 

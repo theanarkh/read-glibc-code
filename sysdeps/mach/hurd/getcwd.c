@@ -1,4 +1,4 @@
-/* Copyright (C) 1991-2023 Free Software Foundation, Inc.
+/* Copyright (C) 1991-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -69,10 +69,7 @@ __hurd_canonicalize_directory_name_internal (file_t thisdir,
   if (size <= 0)
     {
       if (buf != NULL)
-	{
-	  errno = EINVAL;
-	  return NULL;
-	}
+        return __hurd_fail (EINVAL), NULL;
 
       size = FILENAME_MAX * 4 + 1;	/* Good starting guess.  */
     }
@@ -222,14 +219,12 @@ __hurd_canonicalize_directory_name_internal (file_t thisdir,
       found:
 	{
 	  /* Prepend the directory name just discovered.  */
+	  size_t offset = file_namep - file_name;
 
-	  if (file_namep - file_name < d->d_namlen + 1)
+	  if (offset < d->d_namlen + 1)
 	    {
 	      if (orig_size > 0)
-		{
-		  errno = ERANGE;
-		  return NULL;
-		}
+		return __hurd_fail (ERANGE), NULL;
 	      else
 		{
 		  size *= 2;
@@ -239,7 +234,7 @@ __hurd_canonicalize_directory_name_internal (file_t thisdir,
 		      free (file_name);
 		      return NULL;
 		    }
-		  file_namep = &buf[file_namep - file_name + size / 2];
+		  file_namep = &buf[offset + size / 2];
 		  file_name = buf;
 		  /* Move current contents up to the end of the buffer.
 		     This is guaranteed to be non-overlapping.  */

@@ -1,5 +1,5 @@
 /* Generic test case for CPU affinity functions.
-   Copyright (C) 2015-2023 Free Software Foundation, Inc.
+   Copyright (C) 2015-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -18,7 +18,7 @@
 
 /* This file is included by the tst-affinity*.c files to test the two
    variants of the functions, under different conditions.  The
-   following functions have to be definied:
+   following functions have to be defined:
 
    static int getaffinity (size_t, cpu_set_t *);
    static int setaffinity (size_t, const cpu_set_t *);

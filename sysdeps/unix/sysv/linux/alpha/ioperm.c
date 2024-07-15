@@ -1,4 +1,4 @@
-/* Copyright (C) 1992-2023 Free Software Foundation, Inc.
+/* Copyright (C) 1992-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -95,7 +95,7 @@ asm(".arch ev56");
 #define TSUNAMI_DENSE_MEM	(0x80000000000UL)
 
 /* Polaris has SPARSE space, but we prefer to use only DENSE
-   because of some idiosyncracies in actually using SPARSE.  */
+   because of some idiosyncrasies in actually using SPARSE.  */
 #define POLARIS_IO_BASE		(0xf9fc000000UL)
 #define POLARIS_DENSE_MEM	(0xf900000000UL)
 

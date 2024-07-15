@@ -1,4 +1,4 @@
-/* Copyright (C) 1993-2023 Free Software Foundation, Inc.
+/* Copyright (C) 1993-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -48,6 +48,19 @@ flush_cleanup (void *not_used)
 }
 #endif
 
+/* Fields in struct _IO_FILE after the _lock field are internal to
+   glibc and opaque to applications.  We can change them as long as
+   the size of struct _IO_FILE is unchanged, which is checked as the
+   part of glibc ABI with sizes of _IO_2_1_stdin_, _IO_2_1_stdout_
+   and _IO_2_1_stderr_.
+
+   NB: When _IO_vtable_offset (fp) == 0, copy relocation will cover the
+   whole struct _IO_FILE.  Otherwise, only fields up to the _lock field
+   will be copied.  */
+_Static_assert (offsetof (struct _IO_FILE, _prevchain)
+		> offsetof (struct _IO_FILE, _lock),
+		"offset of _prevchain > offset of _lock");
+
 void
 _IO_un_link (struct _IO_FILE_plus *fp)
 {
@@ -62,6 +75,14 @@ _IO_un_link (struct _IO_FILE_plus *fp)
 #endif
       if (_IO_list_all == NULL)
 	;
+      else if (_IO_vtable_offset ((FILE *) fp) == 0)
+	{
+	  FILE **pr = fp->file._prevchain;
+	  FILE *nx = fp->file._chain;
+	  *pr = nx;
+	  if (nx != NULL)
+	    nx->_prevchain = pr;
+	}
       else if (fp == _IO_list_all)
 	_IO_list_all = (struct _IO_FILE_plus *) _IO_list_all->file._chain;
       else
@@ -95,6 +116,12 @@ _IO_link_in (struct _IO_FILE_plus *fp)
       _IO_flockfile ((FILE *) fp);
 #endif
       fp->file._chain = (FILE *) _IO_list_all;
+      if (_IO_vtable_offset ((FILE *) fp) == 0)
+	{
+	  fp->file._prevchain = (FILE **) &_IO_list_all;
+	  if (_IO_list_all != NULL)
+	    _IO_list_all->file._prevchain = &fp->file._chain;
+	}
       _IO_list_all = fp;
 #ifdef _IO_MTSAFE_IO
       _IO_funlockfile ((FILE *) fp);
@@ -682,7 +709,7 @@ _IO_adjust_column (unsigned start, const char *line, int count)
 libc_hidden_def (_IO_adjust_column)
 
 int
-_IO_flush_all_lockp (int do_lock)
+_IO_flush_all (void)
 {
   int result = 0;
   FILE *fp;
@@ -695,8 +722,7 @@ _IO_flush_all_lockp (int do_lock)
   for (fp = (FILE *) _IO_list_all; fp != NULL; fp = fp->_chain)
     {
       run_fp = fp;
-      if (do_lock)
-	_IO_flockfile (fp);
+      _IO_flockfile (fp);
 
       if (((fp->_mode <= 0 && fp->_IO_write_ptr > fp->_IO_write_base)
 	   || (_IO_vtable_offset (fp) == 0
@@ -706,8 +732,7 @@ _IO_flush_all_lockp (int do_lock)
 	  && _IO_OVERFLOW (fp, EOF) == EOF)
 	result = EOF;
 
-      if (do_lock)
-	_IO_funlockfile (fp);
+      _IO_funlockfile (fp);
       run_fp = NULL;
     }
 
@@ -717,14 +742,6 @@ _IO_flush_all_lockp (int do_lock)
 #endif
 
   return result;
-}
-
-
-int
-_IO_flush_all (void)
-{
-  /* We want locking.  */
-  return _IO_flush_all_lockp (1);
 }
 libc_hidden_def (_IO_flush_all)
 
@@ -765,8 +782,8 @@ weak_alias (_IO_flush_all_linebuffered, _flushlbf)
    actual buffer because this will happen anyway once the program
    terminated.  If we do want to look for memory leaks we have to free
    the buffers.  Whether something is freed is determined by the
-   function sin the libc_freeres section.  Those are called as part of
-   the atexit routine, just like _IO_cleanup.  The problem is we do
+   function called by __libc_freeres (those are not called as part of
+   the atexit routine, different from  _IO_cleanup).  The problem is we do
    not know whether the freeres code is called first or _IO_cleanup.
    if the former is the case, we set the DEALLOC_BUFFER variable to
    true and _IO_unbuffer_all will take care of the rest.  If
@@ -791,6 +808,9 @@ _IO_unbuffer_all (void)
     {
       int legacy = 0;
 
+      run_fp = fp;
+      _IO_flockfile (fp);
+
 #if SHLIB_COMPAT (libc, GLIBC_2_0, GLIBC_2_1)
       if (__glibc_unlikely (_IO_vtable_offset (fp) != 0))
 	legacy = 1;
@@ -800,18 +820,6 @@ _IO_unbuffer_all (void)
 	  /* Iff stream is un-orientated, it wasn't used. */
 	  && (legacy || fp->_mode != 0))
 	{
-#ifdef _IO_MTSAFE_IO
-	  int cnt;
-#define MAXTRIES 2
-	  for (cnt = 0; cnt < MAXTRIES; ++cnt)
-	    if (fp->_lock == NULL || _IO_lock_trylock (*fp->_lock) == 0)
-	      break;
-	    else
-	      /* Give the other thread time to finish up its use of the
-		 stream.  */
-	      __sched_yield ();
-#endif
-
 	  if (! legacy && ! dealloc_buffers && !(fp->_flags & _IO_USER_BUF))
 	    {
 	      fp->_flags |= _IO_USER_BUF;
@@ -825,17 +833,15 @@ _IO_unbuffer_all (void)
 
 	  if (! legacy && fp->_mode > 0)
 	    _IO_wsetb (fp, NULL, NULL, 0);
-
-#ifdef _IO_MTSAFE_IO
-	  if (cnt < MAXTRIES && fp->_lock != NULL)
-	    _IO_lock_unlock (*fp->_lock);
-#endif
 	}
 
       /* Make sure that never again the wide char functions can be
 	 used.  */
       if (! legacy)
 	fp->_mode = -1;
+
+      _IO_funlockfile (fp);
+      run_fp = NULL;
     }
 
 #ifdef _IO_MTSAFE_IO
@@ -844,8 +850,8 @@ _IO_unbuffer_all (void)
 #endif
 }
 
-
-libc_freeres_fn (buffer_free)
+void
+__libio_freemem (void)
 {
   dealloc_buffers = true;
 
@@ -861,9 +867,7 @@ libc_freeres_fn (buffer_free)
 int
 _IO_cleanup (void)
 {
-  /* We do *not* want locking.  Some threads might use streams but
-     that is their problem, we flush them underneath them.  */
-  int result = _IO_flush_all_lockp (0);
+  int result = _IO_flush_all ();
 
   /* We currently don't have a reliable mechanism for making sure that
      C++ static destructors are executed in the correct order.

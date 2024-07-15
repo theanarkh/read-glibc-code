@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # Generate testcase files and Makefile fragments for DSO sorting test
-# Copyright (C) 2021-2023 Free Software Foundation, Inc.
+# Copyright (C) 2021-2024 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 #
 # The GNU C Library is free software; you can redistribute it and/or
@@ -1069,7 +1069,7 @@ def process_testcase(t):
                           t.test_name))
     t.sh.close()
 
-# Decription file parsing
+# Description file parsing
 def parse_description_file(filename):
     global default_tunable_options
     global current_input_lineno

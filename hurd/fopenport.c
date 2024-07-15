@@ -1,4 +1,4 @@
-/* Copyright (C) 1994-2023 Free Software Foundation, Inc.
+/* Copyright (C) 1994-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -126,10 +126,7 @@ __fopenport (mach_port_t port, const char *mode)
 
   /* Check the access mode.  */
   if ((pflags & needflags) != needflags)
-    {
-      errno = EBADF;
-      return NULL;
-    }
+    return __hurd_fail (EBADF), NULL;
 
   return fopencookie ((void *) (uintptr_t) port,
                       mode, funcsio);

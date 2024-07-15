@@ -1,5 +1,5 @@
 /* Internal header for parsing printf format strings.
-   Copyright (C) 1995-2023 Free Software Foundation, Inc.
+   Copyright (C) 1995-2024 Free Software Foundation, Inc.
    This file is part of th GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -93,14 +93,17 @@ __find_specwc (const unsigned int *format)
    with the parsed details.  POSN is the number of arguments already
    consumed.  At most MAXTYPES - POSN types are filled in TYPES.  Return
    the number of args consumed by this spec; *MAX_REF_ARG is updated so it
-   remains the highest argument index used.  */
+   remains the highest argument index used.  *FAILED is set to indicate
+   whether parsing failed and printf should return with an error status.  */
 extern size_t __parse_one_specmb (const unsigned char *format, size_t posn,
 				  struct printf_spec *spec,
-				  size_t *max_ref_arg) attribute_hidden;
+				  size_t *max_ref_arg,
+				  bool *failed) attribute_hidden;
 
 extern size_t __parse_one_specwc (const unsigned int *format, size_t posn,
 				  struct printf_spec *spec,
-				  size_t *max_ref_arg) attribute_hidden;
+				  size_t *max_ref_arg,
+				  bool *failed) attribute_hidden;
 
 
 

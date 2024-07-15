@@ -1,4 +1,4 @@
-/* Copyright (C) 1996-2023 Free Software Foundation, Inc.
+/* Copyright (C) 1996-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -51,7 +51,7 @@
 
    Return:
 
-	On success the thread ID of the child process is returend in
+	On success the thread ID of the child process is returned in
 	the callers context.
 	On error return -1, and set errno to the value returned by
 	the syscall.

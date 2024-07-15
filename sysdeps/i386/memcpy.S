@@ -1,5 +1,5 @@
 /* memcpy with REP MOVSB/STOSB
-   Copyright (C) 2015-2023 Free Software Foundation, Inc.
+   Copyright (C) 2015-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -46,6 +46,7 @@ ENTRY (MEMCPY_CHK)
 	cmpl	%eax, 16(%esp)
 	jb	HIDDEN_JUMPTARGET (__chk_fail)
 END (MEMCPY_CHK)
+libc_hidden_builtin_def (MEMCPY_CHK)
 #endif
 ENTRY (MEMCPY)
 	PUSH	(%esi)

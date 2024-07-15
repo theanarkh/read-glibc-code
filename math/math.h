@@ -1,5 +1,5 @@
 /* Declarations for math functions.
-   Copyright (C) 1991-2023 Free Software Foundation, Inc.
+   Copyright (C) 1991-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -114,37 +114,37 @@ __BEGIN_DECLS
 #endif
 #if (__HAVE_FLOAT16					\
      && __GLIBC_USE (IEC_60559_TYPES_EXT)		\
-     && (defined __USE_GNU || !__GLIBC_USE (ISOC2X)))
+     && (defined __USE_GNU || !__GLIBC_USE (ISOC23)))
 # define SNANF16 (__builtin_nansf16 (""))
 #endif
 #if (__HAVE_FLOAT32					\
      && __GLIBC_USE (IEC_60559_TYPES_EXT)		\
-     && (defined __USE_GNU || !__GLIBC_USE (ISOC2X)))
+     && (defined __USE_GNU || !__GLIBC_USE (ISOC23)))
 # define SNANF32 (__builtin_nansf32 (""))
 #endif
 #if (__HAVE_FLOAT64					\
      && __GLIBC_USE (IEC_60559_TYPES_EXT)		\
-     && (defined __USE_GNU || !__GLIBC_USE (ISOC2X)))
+     && (defined __USE_GNU || !__GLIBC_USE (ISOC23)))
 # define SNANF64 (__builtin_nansf64 (""))
 #endif
 #if (__HAVE_FLOAT128					\
      && __GLIBC_USE (IEC_60559_TYPES_EXT)		\
-     && (defined __USE_GNU || !__GLIBC_USE (ISOC2X)))
+     && (defined __USE_GNU || !__GLIBC_USE (ISOC23)))
 # define SNANF128 (__builtin_nansf128 (""))
 #endif
 #if (__HAVE_FLOAT32X					\
      && __GLIBC_USE (IEC_60559_TYPES_EXT)		\
-     && (defined __USE_GNU || !__GLIBC_USE (ISOC2X)))
+     && (defined __USE_GNU || !__GLIBC_USE (ISOC23)))
 # define SNANF32X (__builtin_nansf32x (""))
 #endif
 #if (__HAVE_FLOAT64X					\
      && __GLIBC_USE (IEC_60559_TYPES_EXT)		\
-     && (defined __USE_GNU || !__GLIBC_USE (ISOC2X)))
+     && (defined __USE_GNU || !__GLIBC_USE (ISOC23)))
 # define SNANF64X (__builtin_nansf64x (""))
 #endif
 #if (__HAVE_FLOAT128X					\
      && __GLIBC_USE (IEC_60559_TYPES_EXT)		\
-     && (defined __USE_GNU || !__GLIBC_USE (ISOC2X)))
+     && (defined __USE_GNU || !__GLIBC_USE (ISOC23)))
 # define SNANF128X (__builtin_nansf128x (""))
 #endif
 
@@ -214,7 +214,7 @@ typedef _Float128x double_t;
 #  define FP_ILOGBNAN	2147483647
 # endif
 #endif
-#if __GLIBC_USE (IEC_60559_BFP_EXT_C2X)
+#if __GLIBC_USE (IEC_60559_BFP_EXT_C23)
 # if __WORDSIZE == 32
 #  define __FP_LONG_MAX 0x7fffffffL
 # else
@@ -246,7 +246,7 @@ typedef _Float128x double_t;
 
 #include <bits/fp-fast.h>
 
-#if __GLIBC_USE (IEC_60559_BFP_EXT_C2X)
+#if __GLIBC_USE (IEC_60559_BFP_EXT_C23)
 /* Rounding direction macros for fromfp functions.  */
 enum
   {
@@ -558,7 +558,7 @@ extern double __REDIRECT_NTH (nexttoward, (double __x, long double __y),
 #define __MATHCALL_NARROW(func, redir, nargs)	\
   __MATHCALL_NARROW_NORMAL (func, nargs)
 
-#if __GLIBC_USE (IEC_60559_BFP_EXT_C2X)
+#if __GLIBC_USE (IEC_60559_BFP_EXT_C23)
 
 # define _Mret_ float
 # define _Marg_ double
@@ -1015,7 +1015,8 @@ enum
 
 /* Return nonzero value if X is positive or negative infinity.  */
 # if __HAVE_DISTINCT_FLOAT128 && !__GNUC_PREREQ (7,0) \
-     && !defined __SUPPORT_SNAN__ && !defined __cplusplus
+     && !defined __SUPPORT_SNAN__ && !defined __cplusplus \
+     && !defined __clang__
    /* Since __builtin_isinf_sign is broken for float128 before GCC 7.0,
       use the helper function, __isinff128, with older compilers.  This is
       only provided for C mode, because in C++ mode, GCC has no support
@@ -1050,7 +1051,7 @@ enum
 
 #endif /* Use ISO C99.  */
 
-#if __GLIBC_USE (IEC_60559_BFP_EXT_C2X)
+#if __GLIBC_USE (IEC_60559_BFP_EXT_C23)
 # include <bits/iscanonical.h>
 
 /* Return nonzero value if X is a signaling NaN.  */
@@ -1301,7 +1302,7 @@ iszero (__T __val)
    these operations.  Generic support in GCC for these as builtins went
    in 2.97, but not all cpus added their patterns until 3.1.  Therefore
    we enable the builtins from 3.1 onwards and use a generic implementation
-   othwerwise.  */
+   otherwise.  */
 #  define isgreater(x, y)	__builtin_isgreater(x, y)
 #  define isgreaterequal(x, y)	__builtin_isgreaterequal(x, y)
 #  define isless(x, y)		__builtin_isless(x, y)
@@ -1331,7 +1332,7 @@ iszero (__T __val)
 # endif
 #endif
 
-#if __GLIBC_USE (IEC_60559_BFP_EXT_C2X)
+#if __GLIBC_USE (IEC_60559_BFP_EXT_C23)
 /* An expression whose type has the widest of the evaluation formats
    of X and Y (which are of floating-point types).  */
 # if __FLT_EVAL_METHOD__ == 2 || __FLT_EVAL_METHOD__ > 64

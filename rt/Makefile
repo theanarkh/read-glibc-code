@@ -1,4 +1,4 @@
-# Copyright (C) 1997-2023 Free Software Foundation, Inc.
+# Copyright (C) 1997-2024 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 
 # The GNU C Library is free software; you can redistribute it and/or
@@ -99,6 +99,11 @@ include ../Rules
 CFLAGS-aio_suspend.c += -fexceptions
 CFLAGS-mq_timedreceive.c += -fexceptions -fasynchronous-unwind-tables
 CFLAGS-mq_timedsend.c += -fexceptions -fasynchronous-unwind-tables
+
+# Exclude fortified routines from being built with _FORTIFY_SOURCE
+routines_no_fortify += \
+  mq_open \
+  # routines_no_fortify
 
 LDFLAGS-rt.so = -Wl,--enable-new-dtags,-z,nodelete
 

@@ -1,5 +1,5 @@
 /* Free resources stored in thread-local variables on thread exit.
-   Copyright (C) 2003-2023 Free Software Foundation, Inc.
+   Copyright (C) 2003-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -16,18 +16,15 @@
    License along with the GNU C Library; if not, see
    <https://www.gnu.org/licenses/>.  */
 
-#include <dlfcn/dlerror.h>
 #include <libc-internal.h>
 #include <malloc-internal.h>
-#include <resolv/resolv-internal.h>
-#include <rpc/rpc.h>
-#include <string.h>
-#include <tls-internal.h>
+#include <set-freeres.h>
 #include <shlib-compat.h>
+#include <tls-internal.h>
 
 /* Thread shutdown function.  Note that this function must be called
    for threads during shutdown for correctness reasons.  Unlike
-   __libc_subfreeres, skipping calls to it is not a valid optimization.
+   __libc_freeres, skipping calls to it is not a valid optimization.
    This is called directly from pthread_create as the thread exits.  */
 void
 __libc_thread_freeres (void)

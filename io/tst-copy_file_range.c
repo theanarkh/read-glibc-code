@@ -1,5 +1,5 @@
 /* Tests for copy_file_range.
-   Copyright (C) 2017-2023 Free Software Foundation, Inc.
+   Copyright (C) 2017-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -166,7 +166,7 @@ short_copy (void)
           inoff = 3;
           xlseek (infd, shift, SEEK_SET);
         }
-      ftruncate (outfd, 0);
+      xftruncate (outfd, 0);
       xlseek (outfd, 0, SEEK_SET);
       outoff = 0;
 

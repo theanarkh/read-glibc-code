@@ -1,5 +1,5 @@
 /* Function tanhf vectorized with AVX2.
-   Copyright (C) 2021-2023 Free Software Foundation, Inc.
+   Copyright (C) 2021-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -72,7 +72,7 @@
 
 #include <sysdep.h>
 
-/* tanhf data tables for avx2 and sse4 implementatins defined here.
+/* tanhf data tables for avx2 and sse4 implementations defined here.
  */
 #include "svml_s_tanhf_rodata.S"
 

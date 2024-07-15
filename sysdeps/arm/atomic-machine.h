@@ -1,5 +1,5 @@
 /* Atomic operations.  Pure ARM version.
-   Copyright (C) 2002-2023 Free Software Foundation, Inc.
+   Copyright (C) 2002-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -76,7 +76,7 @@ void __arm_link_error (void);
                        mem, new, old, __ATOMIC_RELEASE)
 
 /* Compare and exchange.
-   For all "bool" routines, we return FALSE if exchange succesful.  */
+   For all "bool" routines, we return FALSE if exchange successful.  */
 
 # define __arch_compare_and_exchange_bool_8_int(mem, newval, oldval, model) \
   ({__arm_link_error (); 0; })

@@ -1,5 +1,5 @@
 /* Conversion module for ISO-2022-KR.
-   Copyright (C) 1998-2023 Free Software Foundation, Inc.
+   Copyright (C) 1998-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -100,7 +100,7 @@ enum
 
 
 /* Since we might have to reset input pointer we must be able to save
-   and retore the state.  */
+   and restore the state.  */
 #define SAVE_RESET_STATE(Save) \
   if (Save)								      \
     save_set = *setp;							      \

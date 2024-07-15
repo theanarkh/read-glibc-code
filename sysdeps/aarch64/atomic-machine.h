@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2023 Free Software Foundation, Inc.
+/* Copyright (C) 2003-2024 Free Software Foundation, Inc.
 
    This file is part of the GNU C Library.
 
@@ -24,7 +24,7 @@
 #define ATOMIC_EXCHANGE_USES_CAS 0
 
 /* Compare and exchange.
-   For all "bool" routines, we return FALSE if exchange succesful.  */
+   For all "bool" routines, we return FALSE if exchange successful.  */
 
 # define __arch_compare_and_exchange_bool_8_int(mem, newval, oldval, model) \
   ({									\

@@ -1,5 +1,5 @@
 /* longlong.h -- definitions for mixed size 32/64 bit arithmetic.
-   Copyright (C) 1991-2023 Free Software Foundation, Inc.
+   Copyright (C) 1991-2024 Free Software Foundation, Inc.
 
    This file is part of the GNU C Library.
 
@@ -1074,7 +1074,7 @@ extern UDItype __umulsidi3 (USItype, USItype);
 #elif __riscv_xlen == 64
   #define MULUW3 "call __muldi3"
 #else
-#error unsupport xlen
+#error unsupported xlen
 #endif /* __riscv_xlen */
 /* We rely on the fact that MULUW3 doesn't clobber the t-registers.
    It can get better register allocation result.  */

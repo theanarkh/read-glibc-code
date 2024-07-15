@@ -1,5 +1,5 @@
 /* Support for dynamic linking code in static libc.
-   Copyright (C) 1996-2023 Free Software Foundation, Inc.
+   Copyright (C) 1996-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -59,10 +59,6 @@ int _dl_dynamic_weak;
 
 /* If nonzero print warnings about problematic situations.  */
 int _dl_verbose;
-
-/* We never do profiling.  */
-const char *_dl_profile;
-const char *_dl_profile_output;
 
 /* Names of shared object for which the RUNPATHs and RPATHs should be
    ignored.  */
@@ -162,21 +158,13 @@ const ElfW(Phdr) *_dl_phdr;
 size_t _dl_phnum;
 uint64_t _dl_hwcap;
 uint64_t _dl_hwcap2;
+uint64_t _dl_hwcap3;
+uint64_t _dl_hwcap4;
 
 enum dso_sort_algorithm _dl_dso_sort_algo;
 
 /* The value of the FPU control word the kernel will preset in hardware.  */
 fpu_control_t _dl_fpu_control = _FPU_DEFAULT;
-
-#if !HAVE_TUNABLES
-/* This is not initialized to HWCAP_IMPORTANT, matching the definition
-   of _dl_important_hwcaps, below, where no hwcap strings are ever
-   used.  This mask is still used to mediate the lookups in the cache
-   file.  Since there is no way to set this nonzero (we don't grok the
-   LD_HWCAP_MASK environment variable here), there is no real point in
-   setting _dl_hwcap nonzero below, but we do anyway.  */
-uint64_t _dl_hwcap_mask;
-#endif
 
 /* Prevailing state of the stack.  Generally this includes PF_X, indicating it's
  * executable but this isn't true for all platforms.  */
@@ -216,7 +204,7 @@ struct link_map *_dl_sysinfo_map;
 #include <dl-vdso-setup.c>
 
 /* During the program run we must not modify the global data of
-   loaded shared object simultanously in two threads.  Therefore we
+   loaded shared object simultaneously in two threads.  Therefore we
    protect `_dl_open' and `_dl_close' in dl-close.c.
 
    This must be a recursive lock since the initializer function of
@@ -286,14 +274,28 @@ _dl_non_dynamic_init (void)
   _dl_main_map.l_phdr = GL(dl_phdr);
   _dl_main_map.l_phnum = GL(dl_phnum);
 
-  _dl_verbose = *(getenv ("LD_WARN") ?: "") == '\0' ? 0 : 1;
-
   /* Set up the data structures for the system-supplied DSO early,
      so they can influence _dl_init_paths.  */
   setup_vdso (NULL, NULL);
 
   /* With vDSO setup we can initialize the function pointers.  */
   setup_vdso_pointers ();
+
+  if (__libc_enable_secure)
+    {
+      static const char unsecure_envvars[] =
+	UNSECURE_ENVVARS
+	;
+      const char *cp = unsecure_envvars;
+
+      while (cp < unsecure_envvars + sizeof (unsecure_envvars))
+	{
+	  __unsetenv (cp);
+	  cp = strchr (cp, '\0') + 1;
+	}
+    }
+
+  _dl_verbose = *(getenv ("LD_WARN") ?: "") == '\0' ? 0 : 1;
 
   /* Initialize the data structures for the search paths for shared
      objects.  */
@@ -310,30 +312,6 @@ _dl_non_dynamic_init (void)
   _dl_bind_not = *(getenv ("LD_BIND_NOT") ?: "") != '\0';
 
   _dl_dynamic_weak = *(getenv ("LD_DYNAMIC_WEAK") ?: "") == '\0';
-
-  _dl_profile_output = getenv ("LD_PROFILE_OUTPUT");
-  if (_dl_profile_output == NULL || _dl_profile_output[0] == '\0')
-    _dl_profile_output
-      = &"/var/tmp\0/var/profile"[__libc_enable_secure ? 9 : 0];
-
-  if (__libc_enable_secure)
-    {
-      static const char unsecure_envvars[] =
-	UNSECURE_ENVVARS
-	;
-      const char *cp = unsecure_envvars;
-
-      while (cp < unsecure_envvars + sizeof (unsecure_envvars))
-	{
-	  __unsetenv (cp);
-	  cp = strchr (cp, '\0') + 1;
-	}
-
-#if !HAVE_TUNABLES
-      if (__access ("/etc/suid-debug", F_OK) != 0)
-	__unsetenv ("MALLOC_CHECK_");
-#endif
-    }
 
 #ifdef DL_PLATFORM_INIT
   DL_PLATFORM_INIT;
@@ -368,7 +346,6 @@ _dl_non_dynamic_init (void)
 DL_SYSINFO_IMPLEMENTATION
 #endif
 
-#if ENABLE_STATIC_PIE
 /* Since relocation to hidden _dl_main_map causes relocation overflow on
    aarch64, a function is used to get the address of _dl_main_map.  */
 
@@ -377,7 +354,6 @@ _dl_get_dl_main_map (void)
 {
   return &_dl_main_map;
 }
-#endif
 
 /* This is used by _dl_runtime_profile, not used on static code.  */
 void

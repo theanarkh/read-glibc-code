@@ -1,4 +1,4 @@
-/* Copyright (C) 2001-2023 Free Software Foundation, Inc.
+/* Copyright (C) 2001-2024 Free Software Foundation, Inc.
 
    This file is part of the GNU C Library.
 
@@ -133,7 +133,7 @@ _Unwind_IteratePhdrCallback (struct dl_phdr_info *info, size_t size, void *ptr)
   data->dbase = NULL;
   if (p_dynamic)
     {
-      /* For dynamicly linked executables and shared libraries,
+      /* For dynamically linked executables and shared libraries,
 	 DT_PLTGOT is the gp value for that object.  */
       ElfW(Dyn) *dyn = (ElfW(Dyn) *)(p_dynamic->p_vaddr + load_base);
       for (; dyn->d_tag != DT_NULL ; dyn++)

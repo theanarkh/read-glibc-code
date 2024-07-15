@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2023 Free Software Foundation, Inc.
+/* Copyright (C) 2003-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -56,7 +56,11 @@ tf (void *arg)
 
   /* This call should block and be cancelable.  */
   char buf[20];
-  read (fd[0], buf, sizeof (buf));
+  if (read (fd[0], buf, sizeof (buf)))
+  {
+    puts ("read unexpectedly returned");
+    exit (1);
+  }
 
   pthread_cleanup_pop (0);
 

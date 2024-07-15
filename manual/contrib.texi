@@ -26,6 +26,9 @@ Ryan S. Arnold for his improvements for Linux on PowerPC and his direction
 as FSF Project Steward for @theglibc{}.
 
 @item
+Arsen Arsenovi@'c for various fixes.
+
+@item
 Miles Bader for writing the @code{argp} argument-parsing package, and the
 @code{argz}/@code{envz} interfaces.
 
@@ -39,6 +42,12 @@ Jeff Bailey for his maintainership of the HPPA architecture.
 
 @item
 Petr Baudis for bug fixes and testing.
+
+@item
+Fr@'ed@'eric B@'erat for numerous fixes and contributions.
+
+@item
+Indu Bhagat for various fixes.
 
 @item
 Anton Blanchard for various fixes.
@@ -62,12 +71,21 @@ Philip Blundell for the ports to Linux/ARM
 support code.
 
 @item
+Mahesh Bodapati for various fixes.
+
+@item
 Per Bothner for the implementation of the @code{libio} library which
 is used to implement @code{stdio} functions.
 
 @item
+Dridi Boukelmoune for various fixes.
+
+@item
 Mark Brown for his direction as part of @theglibc{} steering
 committee.
+
+@item
+Sergey Bugaev for numerous contributions to Hurd.
 
 @item
 Thomas Bushnell for his contributions to Hurd.
@@ -79,10 +97,25 @@ Yinyu Cai for their maintainership of the LoongArch port.
 Rogerio Alves Cardoso for various fixes to PowerPC.
 
 @item
+Daniel Cederman for fixes to the Sparc port.
+
+@item
+Kito Cheng for various fixes.
+
+@item
 Paul Clarke for optimized functions on PowerPC.
 
 @item
+Alejandro Colomar for various fixes.
+
+@item
+Martin Coufal for various fixes.
+
+@item
 Mike Crowe for various fixes.
+
+@item
+Flavio Cruz for contributions to Hurd.
 
 @item
 Palmer Dabbelt for contributing the port to Linux/RISC-V.
@@ -91,11 +124,17 @@ Palmer Dabbelt for contributing the port to Linux/RISC-V.
 DJ Delorie for maintenance of Linux/RISC-V, and various fixes.
 
 @item
-Wilco Dijkstra for various fixes.
+Jianbo Deng for the work on the Loongson port.
+
+@item
+Wilco Dijkstra for various fixes and work on the AArch64 port.
 
 @item
 Liubov Dmitrieva for optimized string and math functions on x86-64 and
 x86.
+
+@item
+Michael Hudson Doyle for various fixes.
 
 @item
 Ulrich Drepper for his many contributions in almost all parts of
@@ -126,15 +165,18 @@ Richard Earnshaw for continued support and fixes to the various ARM
 machine files.
 
 @item
-Paul Eggert for the @code{mktime} function and for his direction as
-part of @theglibc{} steering committee.
+Paul Eggert for the @code{mktime} function, for his direction as
+part of @theglibc{} steering committee, and numerous fixes.
+
+@item
+Roy Eldar for various fixes.
 
 @item
 Steve Ellcey for various fixes.
 
 @item
 Mike FABIAN for automating Unicode updates, for updating the locale data
-for ISO 14651, for updating the library Unicode support, and for various
+for ISO 14651, for updating the library Unicode support, and for many
 locale updates and fixes.
 
 @item
@@ -159,13 +201,19 @@ Martin Galvan for contributing gdb pretty printer support to glibc and adding
 an initial set of pretty printers for structures in the POSIX Threads library.
 
 @item
+Romain Geissler for various fixes.
+
+@item
 Michael Glad for the passphrase-hashing function @code{crypt} and related
-functions.
+functions (no longer part of glibc, but we still appreciate his work).
 
 @item
 Wolfram Gloger for contributing the memory allocation functions
 functions @code{malloc}, @code{realloc} and @code{free} and related
 code.
+
+@item
+Noah Goldstein for contributing extensive x86 / x86-64 optimizations.
 
 @item
 Gabriel F. T. Gomes for his improvements for Linux on PowerPC and for
@@ -184,7 +232,7 @@ and malloc checking functions like @code{mcheck}.
 
 @item
 Bruno Haible for his improvements to the @code{iconv} and locale
-implementations.
+implementations and various fixes.
 
 @item
 Mao Han for the C-SKY port.
@@ -200,6 +248,15 @@ David Holsgrove for the port to Linux on MicroBlaze.
 Leonhard Holz for various fixes.
 
 @item
+Stafford Horne for maintainership of the OpenRISC port.
+
+@item
+Ying Huang for work on the MIPS port.
+
+@item
+Guy-Fleury Iteriteka for contributions to Hurd support.
+
+@item
 Daniel Jacobowitz for various fixes and enhancements.
 
 @item
@@ -208,6 +265,9 @@ Andreas Jaeger for the port to Linux on x86-64
 (@code{mips-@var{anything}-linux}), implementing the @file{ldconfig}
 program, providing a test suite for the math library and for his
 direction as part of @theglibc{} steering committee.
+
+@item
+Sam James for various fixes.
 
 @item
 Aurelien Jarno for various fixes.
@@ -237,12 +297,18 @@ Mark Kettenis for implementing the @code{utmpx} interface and a utmp
 daemon, and for a Hesiod NSS module.
 
 @item
+Simon Kissane for gmon improvements.
+
+@item
 Andi Kleen for implementing pthreads lock elision with TSX.
 
 @item
 Kazumoto Kojima for the port of the Mach and Hurd code to the MIPS
 architecture (@code{mips-@var{anything}-gnu}) and for his work on the
 SH architecture.
+
+@item
+Pavel Kozlov for maintainership of the ARC port.
 
 @item
 Maxim Kuvyrkov for various fixes.
@@ -276,7 +342,7 @@ Ilya Leoshkevich for various fixes.
 Dmitry V. Levin for various fixes.
 
 @item
-Stefan Liebler for various fixes.
+Stefan Liebler for numerous fixes and the work on the S390 port.
 
 @item
 Hongjiu Lu for providing the support for a Linux 32-bit runtime
@@ -289,6 +355,9 @@ Technology, and many bug fixes.
 Rafa@l{} Lu@dotaccent{z}y@'nski
 for contributing support for two grammatical forms of month
 names, and for various fixes to locales.
+
+@item
+Maxim Kuvyrkov for various fixes.
 
 @item
 Luis Machado for optimized functions on PowerPC.
@@ -330,7 +399,13 @@ David Miller for contributing the port to Linux/Sparc
 (@code{sparc*-@var{anything}-linux}).
 
 @item
+Cupertino Miranda for various fixes.
+
+@item
 Alan Modra for his improvements for Linux on PowerPC.
+
+@item
+Sachin Monga for various fixes.
 
 @item
 David Mosberger-Tang for contributing the port to Linux/Alpha
@@ -357,14 +432,17 @@ Joseph S. Myers for numerous bug fixes for the libm functions, for
 his maintainership of the ARM and MIPS architectures and the math
 component, improving cross-compilation and cross-testing of
 @theglibc{}, expanded coverage of conformtest, merging the ports/
-subdirectory into the @glibcadj{} main repository and his direction as
-FSF Project Steward for @theglibc{}.
+subdirectory into the @glibcadj{} main repository, C23 support,
+and his direction as FSF Project Steward for @theglibc{}.
 
 @item
 Marko Myllynen for various fixes.
 
 @item
-Szabolcs Nagy for various fixes.
+Szabolcs Nagy for various fixes and contributions to AArch64.
+
+@item
+Nab for various fixes.
 
 @item
 Will Newton for contributing some optimized string functions and pointer
@@ -383,6 +461,12 @@ safety documentation in the manual, for his direction as FSF Project
 Maintainer and for various fixes.
 
 @item
+Sunil K. Pandey for various fixes.
+
+@item
+Ronan Pigott for various fixes.
+
+@item
 Paul Pluzhnikov for various fixes.
 
 @item
@@ -397,6 +481,10 @@ infrastructure.
 Tom Quinn for contributing the startup code to support SunOS shared
 libraries and the port to SGI machines running Irix 4
 (@code{mips-sgi-irix4}).
+
+@item
+Joe Ramsay for contributing to the AArch64 port, in particular the
+vector library.
 
 @item
 Torvald Riegel for the implementation of new algorithms for semaphores,
@@ -451,10 +539,19 @@ Marcus Shawcroft for contributing the AArch64 port.
 TAMUKI Shoichi for various fixes.
 
 @item
+Joe Simmons-Talbott for various fixes.
+
+@item
 Franz Sirl for various fixes.
 
 @item
+Gavin Smith for various fixes.
+
+@item
 Jes Sorensen for porting to Linux on IA64 (@code{ia64-@var{anything}-linux}).
+
+@item
+Julian Squires for various fixes.
 
 @item
 Rajalakshmi Srinivasaraghavan for various fixes and optimizations on PowerPC,
@@ -475,13 +572,19 @@ Ian Lance Taylor for contributing the port to the MIPS DECStation
 running Ultrix 4 (@code{mips-dec-ultrix4}).
 
 @item
-Samuel Thibault for improving the Hurd port.
+Samuel Thibault for numerous improvements to the Hurd port.
 
 @item
 Pino Toscano for various fixes.
 
 @item
 Matt Turner for various fixes to the Alpha port.
+
+@item
+Valery Ushakov for locale fixes.
+
+@item
+Hsiangkai Wang for various fixes.
 
 @item
 Tim Waugh for the implementation of the POSIX.2 @code{wordexp}
@@ -492,7 +595,7 @@ Ulrich Weigand for various fixes to the PowerPC64 and Arm ports.
 
 @item
 Florian Weimer for his maintainership of the network component, for handling
-of security issues, and for various fixes.
+of security issues, and for numerous fixes and contributions.
 
 @item
 Zack Weinberg for the @code{explicit_bzero} implementation and for various
@@ -502,11 +605,20 @@ fixes.
 Mark Wielaard for various fixes.
 
 @item
+Xi Ruoyao for various fixes.
+
+@item
+Qixing ksyx Xue for various fixes.
+
+@item
+Adam Yi for various fixes.
+
+@item
 Eric Youngdale for implementing versioning of objects on the symbol level.
 
 @item
-Adhemerval Zanella for optimized functions on PowerPC, ISO C threads support
-and various fixes.
+Adhemerval Zanella for optimized functions on PowerPC, ISO C threads support,
+the work on tunables, and numerous contributions and fixes.
 
 @item
 Xuelei Zhang for optimized functions on AArch64.
@@ -518,7 +630,7 @@ a different license:
 
 @itemize @bullet
 @item
-The timezone support code is derived from the public-domain timezone
+The time zone support code is derived from the public-domain time zone
 package by Arthur David Olson and his many contributors.
 
 @item

@@ -1,5 +1,5 @@
 /* Function tanhf vectorized with AVX-512.
-   Copyright (C) 2021-2023 Free Software Foundation, Inc.
+   Copyright (C) 2021-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -220,7 +220,7 @@ L(SPECIAL_VALUES_LOOP):
 	xorl	%ebp, %ebp
 	tzcntl	%ebx, %ebp
 
-	/* Scalar math fucntion call to process special input.  */
+	/* Scalar math function call to process special input.  */
 	vmovss	64(%rsp, %rbp, 4), %xmm0
 	call	tanhf@PLT
 

@@ -1,5 +1,5 @@
 /* Temporary file handling for tests.
-   Copyright (C) 1998-2023 Free Software Foundation, Inc.
+   Copyright (C) 1998-2024 Free Software Foundation, Inc.
    Copyright The GNU Tools Authors.
    This file is part of the GNU C Library.
 
@@ -27,6 +27,7 @@
 #include <support/support.h>
 
 #include <errno.h>
+#include <limits.h>
 #include <paths.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -249,7 +250,7 @@ support_delete_temp_files (void)
   pid_t pid = getpid ();
   while (temp_name_list != NULL)
     {
-      /* Only perform the removal if the path was registed in the same
+      /* Only perform the removal if the path was registered in the same
 	 process, as identified by the PID.  (This assumes that the
 	 parent process which registered the temporary file sticks
 	 around, to prevent PID reuse.)  */

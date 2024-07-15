@@ -1,5 +1,5 @@
 /* Startup code for statically linked Hurd/x86_64 binaries.
-   Copyright (C) 1998-2023 Free Software Foundation, Inc.
+   Copyright (C) 1998-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -19,6 +19,13 @@
 	.text
 	.globl _start
 _start:
+
+	leaq __memcpy_sse2_unaligned(%rip), %rax
+	movq %rax, memcpy@GOTPCREL(%rip)
+	leaq __strlen_sse2(%rip), %rax
+	movq %rax, strlen@GOTPCREL(%rip)
+
+	movq %rsp, %rdi
 	call _hurd_stack_setup
 	xorq %rdx, %rdx
 	jmp _start1

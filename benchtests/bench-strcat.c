@@ -1,5 +1,5 @@
 /* Measure strcat functions.
-   Copyright (C) 2013-2023 Free Software Foundation, Inc.
+   Copyright (C) 2013-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -52,7 +52,7 @@ IMPL (generic_strcat, 0)
 static void
 do_one_test (json_ctx_t *json_ctx, impl_t *impl, CHAR *dst, const CHAR *src)
 {
-  size_t k = STRLEN (dst), i, iters = INNER_LOOP_ITERS_LARGE;
+  size_t k = STRLEN (dst), i, iters = INNER_LOOP_ITERS_LARGE / CHARBYTES;
   timing_t start, stop, cur;
 
   if (CALL (impl, dst, src) != dst)

@@ -1,4 +1,4 @@
-/* Copyright (C) 2021-2023 Free Software Foundation, Inc.
+/* Copyright (C) 2021-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -37,7 +37,7 @@ do_test (void)
   tzset ();
 
   return
-    /* Sanity-check that we got the right timezone-name for DST.  For
+    /* Sanity-check that we got the right abbreviation for DST.  For
        normal time, we're likely to get "-00" (the "unspecified" marker),
        even though the POSIX timezone string says "-04".  Let's not test
        that.  */

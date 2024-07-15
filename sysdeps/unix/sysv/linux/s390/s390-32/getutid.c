@@ -1,4 +1,4 @@
-/* Copyright (C) 2008-2023 Free Software Foundation, Inc.
+/* Copyright (C) 2008-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -25,6 +25,7 @@
 # define weak_alias(n,a)
 #endif
 #include "login/getutid.c"
+_weak_alias (buffer, __libc_getutid_freemem_ptr)
 
 #if defined SHARED
 default_symbol_version (__getutid, getutid, UTMP_COMPAT_BASE);

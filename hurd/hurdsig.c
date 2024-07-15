@@ -1,4 +1,4 @@
-/* Copyright (C) 1991-2023 Free Software Foundation, Inc.
+/* Copyright (C) 1991-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -15,6 +15,7 @@
    License along with the GNU C Library; if not, see
    <https://www.gnu.org/licenses/>.  */
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,6 +23,7 @@
 #include <lock-intern.h>	/* For `struct mutex'.  */
 #include <pthreadP.h>
 #include <mach.h>
+#include <mach/setup-thread.h>
 #include <mach/thread_switch.h>
 #include <mach/mig_support.h>
 #include <mach/vm_param.h>
@@ -174,6 +176,7 @@ _hurd_sigstate_set_global_rcv (struct hurd_sigstate *ss)
   assert (ss->thread != MACH_PORT_NULL);
   ss->actions[0].sa_handler = SIG_IGN;
 }
+libc_hidden_def (_hurd_sigstate_set_global_rcv)
 
 /* Check whether SS is a global receiver.  */
 static int
@@ -193,6 +196,8 @@ _hurd_sigstate_lock (struct hurd_sigstate *ss)
     __spin_lock (&_hurd_global_sigstate->lock);
   __spin_lock (&ss->lock);
 }
+libc_hidden_def (_hurd_sigstate_lock)
+
 void
 _hurd_sigstate_unlock (struct hurd_sigstate *ss)
 {
@@ -200,7 +205,7 @@ _hurd_sigstate_unlock (struct hurd_sigstate *ss)
   if (sigstate_is_global_rcv (ss))
     __spin_unlock (&_hurd_global_sigstate->lock);
 }
-libc_hidden_def (_hurd_sigstate_set_global_rcv)
+libc_hidden_def (_hurd_sigstate_unlock)
 
 /* Retrieve a thread's full set of pending signals, including the global
    ones if appropriate.  SS must be locked.  */
@@ -212,6 +217,7 @@ _hurd_sigstate_pending (const struct hurd_sigstate *ss)
     __sigorset (&pending, &pending, &_hurd_global_sigstate->pending);
   return pending;
 }
+libc_hidden_def (_hurd_sigstate_pending)
 
 /* Clear a pending signal and return the associated detailed
    signal information. SS must be locked, and must have signal SIGNO
@@ -230,8 +236,6 @@ sigstate_clear_pending (struct hurd_sigstate *ss, int signo)
   __sigdelset (&ss->pending, signo);
   return ss->pending_data[signo];
 }
-libc_hidden_def (_hurd_sigstate_lock)
-libc_hidden_def (_hurd_sigstate_unlock)
 
 /* Retrieve a thread's action vector.  SS must be locked.  */
 struct sigaction *
@@ -242,7 +246,6 @@ _hurd_sigstate_actions (struct hurd_sigstate *ss)
   else
     return ss->actions;
 }
-libc_hidden_def (_hurd_sigstate_pending)
 
 
 /* Signal delivery itself is on this page.  */
@@ -258,7 +261,6 @@ libc_hidden_def (_hurd_sigstate_pending)
 #include <hurd/msg_server.h>
 #include <hurd/msg_reply.h>	/* For __msg_sig_post_reply.  */
 #include <hurd/interrupt.h>
-#include <assert.h>
 #include <unistd.h>
 
 
@@ -414,9 +416,9 @@ _hurdsig_abort_rpcs (struct hurd_sigstate *ss, int signo, int sigthread,
 		     struct machine_thread_all_state *state, int *state_change,
 		     void (*reply) (void))
 {
-  extern const void _hurd_intr_rpc_msg_about_to;
-  extern const void _hurd_intr_rpc_msg_setup_done;
-  extern const void _hurd_intr_rpc_msg_in_trap;
+  extern const void _hurd_intr_rpc_msg_about_to attribute_hidden;
+  extern const void _hurd_intr_rpc_msg_setup_done attribute_hidden;
+  extern const void _hurd_intr_rpc_msg_in_trap attribute_hidden;
   mach_port_t rcv_port = MACH_PORT_NULL;
   mach_port_t intr_port;
 
@@ -476,9 +478,18 @@ _hurdsig_abort_rpcs (struct hurd_sigstate *ss, int signo, int sigthread,
           if (reply)
             {
               /* The interrupt didn't work.
-                 Destroy the receive right the thread is blocked on.  */
-              __mach_port_destroy (__mach_task_self (), *reply);
-              *reply = MACH_PORT_NULL;
+                 Destroy the receive right the thread is blocked on, and
+                 replace it with a dead name to keep the name from reuse until
+                 the therad is done with it.  To do this atomically, first
+                 insert a send right, and then destroy the receive right,
+                 turning the send right into a dead name.  */
+              err = __mach_port_insert_right (__mach_task_self (),
+                                              *reply, *reply,
+                                              MACH_MSG_TYPE_MAKE_SEND);
+              assert_perror (err);
+              err = __mach_port_mod_refs (__mach_task_self (), *reply,
+                                          MACH_PORT_RIGHT_RECEIVE, -1);
+              assert_perror (err);
             }
 
           /* The system call return value register now contains
@@ -906,7 +917,7 @@ post_signal (struct hurd_sigstate *ss,
 			       | __sigmask (SIGTSTP))))
     {
       /* If we would ordinarily stop for a job control signal, but we are
-	 orphaned so noone would ever notice and continue us again, we just
+	 orphaned so no one would ever notice and continue us again, we just
 	 quietly die, alone and in the dark.  */
       detail->code = signo;
       signo = SIGKILL;
@@ -1515,10 +1526,11 @@ _hurdsig_init (const int *intarray, size_t intarraysize)
       assert_perror (err);
 
       stacksize = __vm_page_size * 8; /* Small stack for signal thread.  */
-      err = __mach_setup_thread (__mach_task_self (), _hurd_msgport_thread,
-				 _hurd_msgport_receive,
-				 (vm_address_t *) &__hurd_sigthread_stack_base,
-				 &stacksize);
+      err = __mach_setup_thread_call (__mach_task_self (),
+				      _hurd_msgport_thread,
+				      _hurd_msgport_receive,
+				      (vm_address_t *) &__hurd_sigthread_stack_base,
+				      &stacksize);
       assert_perror (err);
       err = __mach_setup_tls (_hurd_msgport_thread);
       assert_perror (err);
@@ -1646,8 +1658,8 @@ _hurdsig_getenv (const char *variable)
       while (*ep)
 	{
 	  const char *p = *ep;
-	  _hurdsig_fault_preemptor.first = (long int) p;
-	  _hurdsig_fault_preemptor.last = VM_MAX_ADDRESS;
+	  _hurdsig_fault_preemptor.first = (unsigned long int) p;
+	  _hurdsig_fault_preemptor.last = (unsigned long int) -1;
 	  if (! strncmp (p, variable, len) && p[len] == '=')
 	    {
 	      size_t valuelen;
@@ -1659,8 +1671,8 @@ _hurdsig_getenv (const char *variable)
 		memcpy (value, p, valuelen);
 	      break;
 	    }
-	  _hurdsig_fault_preemptor.first = (long int) ++ep;
-	  _hurdsig_fault_preemptor.last = (long int) (ep + 1);
+	  _hurdsig_fault_preemptor.first = (unsigned long int) ++ep;
+	  _hurdsig_fault_preemptor.last = (unsigned long int) (ep + 1);
 	}
       _hurdsig_end_catch_fault ();
       return value;

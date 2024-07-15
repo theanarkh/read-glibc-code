@@ -1,5 +1,5 @@
 /* PLT trampolines.  x86-64 version.
-   Copyright (C) 2009-2023 Free Software Foundation, Inc.
+   Copyright (C) 2009-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -27,39 +27,7 @@
 # undef LOCAL_STORAGE_AREA
 # undef BASE
 
-# if (STATE_SAVE_ALIGNMENT % 16) != 0
-#  error STATE_SAVE_ALIGNMENT must be multples of 16
-# endif
-
-# if (STATE_SAVE_OFFSET % STATE_SAVE_ALIGNMENT) != 0
-#  error STATE_SAVE_OFFSET must be multples of STATE_SAVE_ALIGNMENT
-# endif
-
-# if DL_RUNTIME_RESOLVE_REALIGN_STACK
-/* Local stack area before jumping to function address: RBX.  */
-#  define LOCAL_STORAGE_AREA	8
-#  define BASE			rbx
-#  ifdef USE_FXSAVE
-/* Use fxsave to save XMM registers.  */
-#   define REGISTER_SAVE_AREA	(512 + STATE_SAVE_OFFSET)
-#   if (REGISTER_SAVE_AREA % 16) != 0
-#    error REGISTER_SAVE_AREA must be multples of 16
-#   endif
-#  endif
-# else
-#  ifndef USE_FXSAVE
-#   error USE_FXSAVE must be defined
-#  endif
-/* Use fxsave to save XMM registers.  */
-#  define REGISTER_SAVE_AREA	(512 + STATE_SAVE_OFFSET + 8)
-/* Local stack area before jumping to function address:  All saved
-   registers.  */
-#  define LOCAL_STORAGE_AREA	REGISTER_SAVE_AREA
-#  define BASE			rsp
-#  if (REGISTER_SAVE_AREA % 16) != 8
-#   error REGISTER_SAVE_AREA must be odd multples of 8
-#  endif
-# endif
+# include "dl-trampoline-state.h"
 
 	.globl _dl_runtime_resolve
 	.hidden _dl_runtime_resolve
@@ -161,7 +129,7 @@ _dl_runtime_resolve:
 
 #if !defined PROF && defined _dl_runtime_profile
 # if (LR_VECTOR_OFFSET % VEC_SIZE) != 0
-#  error LR_VECTOR_OFFSET must be multples of VEC_SIZE
+#  error LR_VECTOR_OFFSET must be multiple of VEC_SIZE
 # endif
 
 	.globl _dl_runtime_profile
@@ -173,7 +141,7 @@ _dl_runtime_profile:
 	cfi_adjust_cfa_offset(16) # Incorporate PLT
 	_CET_ENDBR
 	/* The La_x86_64_regs data structure pointed to by the
-	   fourth paramater must be VEC_SIZE-byte aligned.  This must
+	   fourth parameter must be VEC_SIZE-byte aligned.  This must
 	   be explicitly enforced.  We have the set up a dynamically
 	   sized stack frame.  %rbx points to the top half which
 	   has a fixed size and preserves the original stack pointer.  */

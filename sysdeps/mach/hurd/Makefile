@@ -1,4 +1,4 @@
-# Copyright (C) 1993-2023 Free Software Foundation, Inc.
+# Copyright (C) 1993-2024 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 
 # The GNU C Library is free software; you can redistribute it and/or
@@ -66,26 +66,32 @@ errno.texinfo = $(..)manual/errno.texi
 
 hurd = $(..)sysdeps/mach/hurd
 
-define mach-errno-h
-($(foreach h,mach/message.h \
+mach-errno-h = \
+	     mach/message.h \
 	     mach/kern_return.h \
 	     mach/mig_errors.h \
-	     device/device_types.h,\
- echo '#include <$h>';\
- ))
-endef
+	     device/device_types.h
 
 # We use the compiler to generate a list of absolute file names for
 # the headers we want to search for Mach error codes, listed above (and
 # incidentally, all other headers those include).
 -include $(common-objpfx)errnos.d
 $(common-objpfx)errnos.d: $(mach-errnos-deps)
-	$(mach-errno-h) | \
-	$(CC) $(CFLAGS) \
-	    $(subst -include $(common-objpfx)libc-modules.h,,$(CPPFLAGS)) \
-	    -M -x c - | \
-	sed $(sed-remove-objpfx) -e 's,- *:,mach-errnos-deps :=,' \
-	    -e 's, \.\./, $(..),g' > $@t
+	echo -n "mach-errnos-deps := " > $@t
+	for h in $(mach-errno-h) ; do \
+		echo "#include <$$h>" \
+		| $(CC) $(CFLAGS) \
+		    $(subst -include $(common-objpfx)libc-modules.h,,$(CPPFLAGS)) \
+		    -M -x c - \
+		| sed $(sed-remove-objpfx) \
+		    -e 's, \.\./, $(..),g' \
+		    -e 's,\\$$,,g' \
+		    -e 's, ,\n,g' \
+		| grep "$$h$$" \
+		| tr '\n' ' ' \
+		  >> $@t ; \
+	done
+	echo >> $@t
 	mv -f $@t $@
 
 $(hurd)/bits/errno.h: $(common-objpfx)stamp-errnos ;
@@ -93,7 +99,7 @@ $(common-objpfx)stamp-errnos: $(hurd)/errnos.awk $(errno.texinfo) \
 			      $(mach-errnos-deps) $(common-objpfx)errnos.d
 	mkdir -p $(hurd-objpfx)bits
 	$(AWK) -f $^ > $(hurd-objpfx)bits/errno.h-tmp
-# Make it unwritable so noone will edit it by mistake.
+# Make it unwritable so no one will edit it by mistake.
 	-chmod a-w $(hurd-objpfx)bits/errno.h-tmp
 	$(move-if-change) $(hurd-objpfx)bits/errno.h-tmp $(hurd)/bits/errno.h
 	touch $@
@@ -197,6 +203,10 @@ ifeq (hurd, $(subdir))
 sysdep_routines += cthreads
 endif
 
+ifeq (elf, $(subdir))
+sysdep-dl-routines += dl-tls-initialized
+endif
+
 ifeq (io, $(subdir))
 sysdep_routines += f_setlk close_nocancel close_nocancel_nostatus \
 		   fcntl_nocancel open_nocancel openat_nocancel read_nocancel \
@@ -205,6 +215,8 @@ sysdep_routines += f_setlk close_nocancel close_nocancel_nostatus \
 		   xstat fxstat lxstat xstat64 fxstat64 lxstat64 \
 		   xmknod xmknodat \
 		   fxstatat fxstatat64
+
+sysdep_headers += bits/types/struct_flock.h
 endif
 
 ifeq (misc, $(subdir))
@@ -315,4 +327,14 @@ tests-unsupported += tst-audit14a
 tests-unsupported += tst-audit15
 tests-unsupported += tst-audit16
 tests-unsupported += tst-audit17
+endif
+
+# For bug 30341
+ifeq ($(subdir),posix)
+tests-unsupported += tst-spawn6
+endif
+
+# For bug 30342
+ifeq ($(subdir),io)
+tests-unsupported += test-lfs
 endif

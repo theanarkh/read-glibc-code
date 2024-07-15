@@ -1,5 +1,5 @@
 /* Map in a shared object's segments.  Generic version.
-   Copyright (C) 1995-2023 Free Software Foundation, Inc.
+   Copyright (C) 1995-2024 Free Software Foundation, Inc.
    Copyright The GNU Toolchain Authors.
    This file is part of the GNU C Library.
 
@@ -36,7 +36,7 @@ _dl_map_segment (const struct loadcmd *c, ElfW(Addr) mappref,
 		       : (2 * c->mapalign));
   ElfW(Addr) map_start = (ElfW(Addr)) __mmap ((void *) mappref, maplen,
 					      PROT_NONE,
-					      MAP_ANONYMOUS|MAP_PRIVATE,
+					      MAP_ANONYMOUS|MAP_COPY,
 					      -1, 0);
   if (__glibc_unlikely ((void *) map_start == MAP_FAILED))
     return map_start;

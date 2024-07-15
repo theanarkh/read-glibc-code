@@ -1,5 +1,5 @@
 /* Helper code for POSIX timer implementation on NPTL.
-   Copyright (C) 2000-2023 Free Software Foundation, Inc.
+   Copyright (C) 2000-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -46,7 +46,7 @@ struct timer_node __timer_array[TIMER_MAX];
 /* Global lock to protect operation on the lists.  */
 pthread_mutex_t __timer_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-/* Variable to protext initialization.  */
+/* Variable to protect initialization.  */
 pthread_once_t __timer_init_once_control = PTHREAD_ONCE_INIT;
 
 /* Nonzero if initialization of timer implementation failed.  */

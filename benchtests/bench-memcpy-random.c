@@ -1,5 +1,5 @@
 /* Measure memcpy performance.
-   Copyright (C) 2016-2023 Free Software Foundation, Inc.
+   Copyright (C) 2016-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -127,7 +127,7 @@ do_one_test (json_ctx_t *json_ctx, impl_t *impl, char *dst, char *src,
 	     copy_t *copy, size_t n)
 {
   timing_t start, stop, cur;
-  size_t iters = INNER_LOOP_ITERS_MEDIUM;
+  size_t iters = INNER_LOOP_ITERS_MEDIUM / 2;
 
   for (int j = 0; j < n; j++)
     CALL (impl, dst + copy[j].dst, src + copy[j].src, copy[j].len);

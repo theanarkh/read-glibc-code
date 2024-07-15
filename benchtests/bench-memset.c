@@ -1,5 +1,5 @@
 /* Measure memset functions.
-   Copyright (C) 2013-2023 Free Software Foundation, Inc.
+   Copyright (C) 2013-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -43,7 +43,7 @@ static void
 do_one_test (json_ctx_t *json_ctx, impl_t *impl, CHAR *s,
 	     int c __attribute ((unused)), size_t n)
 {
-  size_t i, iters = INNER_LOOP_ITERS_LARGE;
+  size_t i, iters = INNER_LOOP_ITERS;
   timing_t start, stop, cur;
 
   TIMING_NOW (start);

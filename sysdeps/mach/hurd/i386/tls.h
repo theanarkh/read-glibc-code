@@ -1,5 +1,5 @@
 /* Definitions for thread-local data handling.  Hurd/i386 version.
-   Copyright (C) 2003-2023 Free Software Foundation, Inc.
+   Copyright (C) 2003-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -32,7 +32,7 @@ typedef struct
 {
   void *tcb;			/* Points to this structure.  */
   dtv_t *dtv;			/* Vector of pointers to TLS data.  */
-  thread_t self;		/* This thread's control port.  */
+  thread_t self_do_not_use;	/* This thread's control port.  */
   int multiple_threads;
   uintptr_t sysinfo;
   uintptr_t stack_guard;
@@ -69,18 +69,6 @@ _Static_assert (offsetof (tcbhead_t, __private_ss) == 0x30,
                   |  (desc->high_word & 0xff000000));			      \
   })
 
-/* Return 1 if TLS is not initialized yet.  */
-#ifndef SHARED
-extern unsigned short __init1_desc;
-#define __HURD_DESC_INITIAL(gs, ds) ((gs) == (ds) || (gs) == __init1_desc)
-#else
-#define __HURD_DESC_INITIAL(gs, ds) ((gs) == (ds))
-#endif
-
-#define __LIBC_NO_TLS()							      \
-  ({ unsigned short ds, gs;						      \
-     asm ("movw %%ds,%w0; movw %%gs,%w1" : "=q" (ds), "=q" (gs));	      \
-     __builtin_expect(__HURD_DESC_INITIAL(gs, ds), 0); })
 #endif
 
 /* The TCB can have any size and the memory following the address the
@@ -101,7 +89,7 @@ extern unsigned short __init1_desc;
 
 /* Use i386-specific RPCs to arrange that %gs segment register prefix
    addresses the TCB in each thread.  */
-# include <mach/machine/mach_i386.h>
+# include <mach/i386/mach_i386.h>
 
 # ifndef HAVE_I386_SET_GDT
 #  define __i386_set_gdt(thr, sel, desc) ((void) (thr), (void) (sel), (void) (desc), MIG_BAD_ID)
@@ -125,18 +113,44 @@ extern unsigned short __init1_desc;
 
 # define HURD_SEL_LDT(sel) (__builtin_expect ((sel) & 4, 0))
 
+#ifndef SHARED
+extern unsigned short __init1_desc;
+# define __HURD_DESC_INITIAL(gs, ds) ((gs) == (ds) || (gs) == __init1_desc)
+#else
+# define __HURD_DESC_INITIAL(gs, ds) ((gs) == (ds))
+#endif
+
+#if !defined (SHARED) || IS_IN (rtld)
+/* Return 1 if TLS is not initialized yet.  */
+extern inline bool __attribute__ ((unused))
+__LIBC_NO_TLS (void)
+{
+  unsigned short ds, gs;
+  asm ("movw %%ds, %w0\n"
+       "movw %%gs, %w1"
+       : "=q" (ds), "=q" (gs));
+  return __glibc_unlikely (__HURD_DESC_INITIAL (gs, ds));
+}
+
+/* Code to initially initialize the thread pointer.  This might need
+   special attention since 'errno' is not yet available and if the
+   operation can cause a failure 'errno' must not be touched.  */
 static inline bool __attribute__ ((unused))
-_hurd_tls_init (tcbhead_t *tcb)
+_hurd_tls_init (tcbhead_t *tcb, bool full)
 {
   HURD_TLS_DESC_DECL (desc, tcb);
   thread_t self = __mach_thread_self ();
   bool success = true;
+  extern mach_port_t __hurd_reply_port0;
 
   /* This field is used by TLS accesses to get our "thread pointer"
      from the TLS point of view.  */
   tcb->tcb = tcb;
   /* We always at least start the sigthread anyway.  */
   tcb->multiple_threads = 1;
+  if (full)
+    /* Take over the reply port we've been using.  */
+    tcb->reply_port = __hurd_reply_port0;
 
   /* Get the first available selector.  */
   int sel = -1;
@@ -162,17 +176,23 @@ _hurd_tls_init (tcbhead_t *tcb)
 
   /* Now install the new selector.  */
   asm volatile ("mov %w0, %%gs" :: "q" (sel));
+  if (full)
+    /* This port is now owned by the TCB.  */
+    __hurd_reply_port0 = MACH_PORT_NULL;
+#ifndef SHARED
+  else
+    __init1_desc = sel;
+#endif
 
 out:
   __mach_port_deallocate (__mach_task_self (), self);
   return success;
 }
 
-/* Code to initially initialize the thread pointer.  This might need
-   special attention since 'errno' is not yet available and if the
-   operation can cause a failure 'errno' must not be touched.  */
-# define TLS_INIT_TP(descr) \
-    _hurd_tls_init ((tcbhead_t *) (descr))
+# define TLS_INIT_TP(descr) _hurd_tls_init ((tcbhead_t *) (descr), 1)
+#else /* defined (SHARED) && !IS_IN (rtld) */
+# define __LIBC_NO_TLS() 0
+#endif
 
 # if __GNUC_PREREQ (6, 0)
 
@@ -399,7 +419,6 @@ _hurd_tls_new (thread_t child, tcbhead_t *tcb)
   HURD_TLS_DESC_DECL (desc, tcb);
 
   tcb->tcb = tcb;
-  tcb->self = child;
 
   if (HURD_SEL_LDT (sel))
     err = __i386_set_ldt (child, sel, &desc, 1);

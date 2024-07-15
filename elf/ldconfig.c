@@ -1,4 +1,4 @@
-/* Copyright (C) 1999-2023 Free Software Foundation, Inc.
+/* Copyright (C) 1999-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    This program is free software; you can redistribute it and/or modify
@@ -40,6 +40,7 @@
 #include <libgen.h>
 
 #include <ldconfig.h>
+#include <endswith.h>
 #include <dl-cache.h>
 #include <dl-hwcaps.h>
 #include <dl-is_dso.h>
@@ -233,7 +234,7 @@ print_version (FILE *stream, struct argp_state *state)
 Copyright (C) %s Free Software Foundation, Inc.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
-"), "2023");
+"), "2024");
   fprintf (stream, gettext ("Written by %s.\n"),
 	   "Andreas Jaeger");
 }
@@ -631,7 +632,7 @@ out:
    - search for libraries which will be added to the cache
    - create symbolic links to the soname for each library
 
-   This has to be done separatly for each directory.
+   This has to be done separately for each directory.
 
    To keep track of which libraries to add to the cache and which
    links to create, we save a list of all libraries.
@@ -661,6 +662,31 @@ struct dlib_entry
   struct dlib_entry *next;
 };
 
+/* Skip some temporary DSO files.  These files may be partially written
+   and lead to ldconfig crashes when examined.  */
+static bool
+skip_dso_based_on_name (const char *name, size_t len)
+{
+  /* Skip temporary files created by the prelink program.  Files with
+     names like these are never really DSOs we want to look at.  */
+  if (len >= sizeof (".#prelink#") - 1)
+    {
+      if (endswithn (name, len, ".#prelink#"))
+	return true;
+      if (len >= sizeof (".#prelink#.XXXXXX") - 1
+	  && memcmp (name + len - sizeof (".#prelink#.XXXXXX")
+		     + 1, ".#prelink#.", sizeof (".#prelink#.") - 1) == 0)
+	return true;
+    }
+  /* Skip temporary files created by RPM.  */
+  if (memchr (name, ';', len) != NULL)
+    return true;
+  /* Skip temporary files created by dpkg.  */
+  if (endswithn (name, len, ".dpkg-new")
+      || endswithn (name, len, ".dpkg-tmp"))
+    return true;
+  return false;
+}
 
 static void
 search_dir (const struct dir_entry *entry)
@@ -677,28 +703,18 @@ search_dir (const struct dir_entry *entry)
 
   char *dir_name;
   char *real_file_name;
-  size_t real_file_name_len;
-  size_t file_name_len = PATH_MAX;
-  char *file_name = alloca (file_name_len);
+  char *file_name;
   if (opt_chroot != NULL)
-    {
-      dir_name = chroot_canon (opt_chroot, entry->path);
-      real_file_name_len = PATH_MAX;
-      real_file_name = alloca (real_file_name_len);
-    }
+    dir_name = chroot_canon (opt_chroot, entry->path);
   else
-    {
-      dir_name = entry->path;
-      real_file_name_len = 0;
-      real_file_name = file_name;
-    }
+    dir_name = entry->path;
 
   DIR *dir;
   if (dir_name == NULL || (dir = opendir (dir_name)) == NULL)
     {
       if (opt_verbose)
 	error (0, errno, _("Can't open directory %s"), entry->path);
-      if (opt_chroot != NULL && dir_name != NULL)
+      if (opt_chroot != NULL)
 	free (dir_name);
       return;
     }
@@ -721,37 +737,18 @@ search_dir (const struct dir_entry *entry)
 	continue;
 
       size_t len = strlen (direntry->d_name);
-      /* Skip temporary files created by the prelink program.  Files with
-	 names like these are never really DSOs we want to look at.  */
-      if (len >= sizeof (".#prelink#") - 1)
-	{
-	  if (strcmp (direntry->d_name + len - sizeof (".#prelink#") + 1,
-		      ".#prelink#") == 0)
-	    continue;
-	  if (len >= sizeof (".#prelink#.XXXXXX") - 1
-	      && memcmp (direntry->d_name + len - sizeof (".#prelink#.XXXXXX")
-			 + 1, ".#prelink#.", sizeof (".#prelink#.") - 1) == 0)
-	    continue;
-	}
-      len += strlen (entry->path) + 2;
-      if (len > file_name_len)
-	{
-	  file_name_len = len;
-	  file_name = alloca (file_name_len);
-	  if (!opt_chroot)
-	    real_file_name = file_name;
-	}
-      sprintf (file_name, "%s/%s", entry->path, direntry->d_name);
+      if (skip_dso_based_on_name (direntry->d_name, len))
+	continue;
+      if (asprintf (&file_name, "%s/%s", entry->path, direntry->d_name) < 0)
+	error (EXIT_FAILURE, errno, _("Could not form library path"));
       if (opt_chroot != NULL)
 	{
-	  len = strlen (dir_name) + strlen (direntry->d_name) + 2;
-	  if (len > real_file_name_len)
-	    {
-	      real_file_name_len = len;
-	      real_file_name = alloca (real_file_name_len);
-	    }
-	  sprintf (real_file_name, "%s/%s", dir_name, direntry->d_name);
+	  if (asprintf (&real_file_name, "%s/%s",
+			dir_name, direntry->d_name) < 0)
+	    error (EXIT_FAILURE, errno, _("Could not form library path"));
 	}
+      else
+	real_file_name = xstrdup (file_name);
 
       struct stat lstat_buf;
       /* We optimize and try to do the lstat call only if needed.  */
@@ -761,7 +758,7 @@ search_dir (const struct dir_entry *entry)
 	if (__glibc_unlikely (lstat (real_file_name, &lstat_buf)))
 	  {
 	    error (0, errno, _("Cannot lstat %s"), file_name);
-	    continue;
+	    goto next;
 	  }
 
       struct stat stat_buf;
@@ -778,7 +775,7 @@ search_dir (const struct dir_entry *entry)
 		{
 		  if (strstr (file_name, ".so") == NULL)
 		    error (0, 0, _("Input file %s not found.\n"), file_name);
-		  continue;
+		  goto next;
 		}
 	    }
 	  if (__glibc_unlikely (stat (target_name, &stat_buf)))
@@ -793,7 +790,7 @@ search_dir (const struct dir_entry *entry)
 	      if (opt_chroot != NULL)
 		free (target_name);
 
-	      continue;
+	      goto next;
 	    }
 
 	  if (opt_chroot != NULL)
@@ -806,7 +803,7 @@ search_dir (const struct dir_entry *entry)
 	  lstat_buf.st_ctime = stat_buf.st_ctime;
 	}
       else if (!S_ISREG (lstat_buf.st_mode))
-	continue;
+	goto next;
 
       char *real_name;
       if (opt_chroot != NULL && is_link)
@@ -816,7 +813,7 @@ search_dir (const struct dir_entry *entry)
 	    {
 	      if (strstr (file_name, ".so") == NULL)
 		error (0, 0, _("Input file %s not found.\n"), file_name);
-	      continue;
+	      goto next;
 	    }
 	}
       else
@@ -828,7 +825,7 @@ search_dir (const struct dir_entry *entry)
 	  && __builtin_expect (lstat (real_file_name, &lstat_buf), 0))
 	{
 	  error (0, errno, _("Cannot lstat %s"), file_name);
-	  continue;
+	  goto next;
 	}
 
       /* First search whether the auxiliary cache contains this
@@ -842,7 +839,7 @@ search_dir (const struct dir_entry *entry)
 	    {
 	      if (real_name != real_file_name)
 		free (real_name);
-	      continue;
+	      goto next;
 	    }
 	  else if (opt_build_cache)
 	    add_to_aux_cache (&lstat_buf, flag, isa_level, soname);
@@ -875,7 +872,7 @@ search_dir (const struct dir_entry *entry)
 	     or downgrade. The problems will arise because ldconfig will,
 	     depending on directory ordering, creat symlinks against libfoo.so
 	     e.g. libfoo.so.1.2 -> libfoo.so, but when libfoo.so is removed
-	     (typically by the removal of a development pacakge not required
+	     (typically by the removal of a development package not required
 	     for the runtime) it will break the libfoo.so.1.2 symlink and the
 	     application will fail to start.  */
 	  const char *real_base_name = basename (real_file_name);
@@ -948,6 +945,10 @@ search_dir (const struct dir_entry *entry)
 	  dlib_ptr->next = dlibs;
 	  dlibs = dlib_ptr;
 	}
+
+    next:
+      free (file_name);
+      free (real_file_name);
     }
 
   closedir (dir);

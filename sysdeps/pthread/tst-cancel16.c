@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2023 Free Software Foundation, Inc.
+/* Copyright (C) 2003-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -50,7 +50,11 @@ tf (void *arg)
   pthread_cleanup_push (cl, NULL);
 
   /* This call should never return.  */
-  (void) lockf (fd, F_LOCK, 0);
+  if (lockf (fd, F_LOCK, 0))
+    {
+      puts ("child thread: lockf failed");
+      exit (1);
+    }
 
   pthread_cleanup_pop (0);
 

@@ -1,4 +1,4 @@
-/* Copyright (C) 1991-2023 Free Software Foundation, Inc.
+/* Copyright (C) 1991-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -147,6 +147,7 @@ do_system (const char *line)
   ret = __posix_spawn (&pid, SHELL_PATH, 0, &spawn_attr,
 		       (char *const[]){ (char *) SHELL_NAME,
 					(char *) "-c",
+					(char *) "--",
 					(char *) line, NULL },
 		       __environ);
   __posix_spawnattr_destroy (&spawn_attr);

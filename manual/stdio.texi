@@ -1828,8 +1828,8 @@ output, but are different when used with @code{scanf} for input
 @item @samp{%b}, @samp{%B}
 Print an integer as an unsigned binary number.  @samp{%b} uses
 lower-case @samp{b} with the @samp{#} flag and @samp{%B} uses
-upper-case.  @samp{%b} is an ISO C2X feature; @samp{%B} is an
-optional ISO C2X feature.  @xref{Integer Conversions}, for
+upper-case.  @samp{%b} is an ISO C23 feature; @samp{%B} is an
+optional ISO C23 feature.  @xref{Integer Conversions}, for
 details.
 
 @item @samp{%o}
@@ -2028,6 +2028,24 @@ Specifies that the argument is a @code{ptrdiff_t}.
 
 This modifier was introduced in @w{ISO C99}.
 
+@item w@var{n}
+Specifies that the argument is a @code{int@var{n}_t} or
+@code{int_least@var{n}_t} (which are the same type), for conversions
+taking signed integers, or @code{uint@var{n}_t} or
+@code{uint_least@var{n}_t} (which are the same type), for conversions
+taking unsigned integers.  If the type is narrower than @code{int},
+the promoted argument is converted back to the specified type.
+
+This modifier was introduced in @w{ISO C23}.
+
+@item wf@var{n}
+Specifies that the argument is a @code{int_fast@var{n}_t} or
+@code{uint_fast@var{n}_t}, as appropriate.  If the type is narrower
+than @code{int}, the promoted argument is converted back to the
+specified type.
+
+This modifier was introduced in @w{ISO C23}.
+
 @item z
 @itemx Z
 Specifies that the argument is a @code{size_t}.
@@ -2126,7 +2144,7 @@ specifier is @samp{%a}, @samp{%e}, @samp{%f}, or @samp{%g} and it is
 @w{[@code{-}]@code{INF}} or @code{NAN} respectively if the conversion is
 @samp{%A}, @samp{%E}, @samp{%F} or @samp{%G}.  On some implementations, a NaN
 may result in longer output with information about the payload of the
-NaN; ISO C2X defines a macro @code{_PRINTF_NAN_LEN_MAX} giving the
+NaN; ISO C23 defines a macro @code{_PRINTF_NAN_LEN_MAX} giving the
 maximum length of such output.
 
 The following flags can be used to modify the behavior:
@@ -2439,7 +2457,10 @@ If @var{size} is zero, nothing, not even the null byte, shall be written and
 The return value is the number of characters which would be generated
 for the given input, excluding the trailing null.  If this value is
 greater than or equal to @var{size}, not all characters from the result have
-been stored in @var{s}.  You should try again with a bigger output
+been stored in @var{s}.  If this happens, you should be wary of using
+the truncated result as that could lead to security, encoding, or
+other bugs in your program (@pxref{Truncating Strings}).
+Instead, you should try again with a bigger output
 string.  Here is an example of doing this:
 
 @smallexample
@@ -3524,6 +3545,10 @@ Matches an optionally signed integer in any of the formats that the C
 language defines for specifying an integer constant.  @xref{Numeric
 Input Conversions}.
 
+@item @samp{%b}
+Matches an unsigned integer written in binary radix.  This is an ISO
+C23 feature.  @xref{Numeric Input Conversions}.
+
 @item @samp{%o}
 Matches an unsigned integer written in octal radix.
 @xref{Numeric Input Conversions}.
@@ -3631,11 +3656,13 @@ For example, any of the strings @samp{10}, @samp{0xa}, or @samp{012}
 could be read in as integers under the @samp{%i} conversion.  Each of
 these specifies a number with decimal value @code{10}.
 
-The @samp{%o}, @samp{%u}, and @samp{%x} conversions match unsigned
-integers in octal, decimal, and hexadecimal radices, respectively.  The
+The @samp{%b}, @samp{%o}, @samp{%u}, and @samp{%x} conversions match unsigned
+integers in binary, octal, decimal, and hexadecimal radices, respectively.  The
 syntax that is recognized is the same as that for the @code{strtoul}
 function (@pxref{Parsing of Integers}) with the appropriate value
-(@code{8}, @code{10}, or @code{16}) for the @var{base} argument.
+(@code{2}, @code{8}, @code{10}, or @code{16}) for the @var{base}
+argument.  The @samp{%b} conversion accepts an optional leading
+@samp{0b} or @samp{0B} in all standards modes.
 
 The @samp{%X} conversion is identical to the @samp{%x} conversion.  They
 both permit either uppercase or lowercase letters to be used as digits.
@@ -3686,6 +3713,20 @@ from 4.4 BSD; a @w{@code{long long int}} is sometimes called a ``quad''
 Specifies that the argument is a @code{ptrdiff_t *}.
 
 This modifier was introduced in @w{ISO C99}.
+
+@item w@var{n}
+Specifies that the argument is an @code{int@var{n}_t *} or
+@code{int_least@var{n}_t *} (which are the same type), or
+@code{uint@var{n}_t *} or @code{uint_least@var{n}_t *} (which are the
+same type).
+
+This modifier was introduced in @w{ISO C23}.
+
+@item wf@var{n}
+Specifies that the argument is an @code{int_fast@var{n}_t *} or
+@code{uint_fast@var{n}_t *}.
+
+This modifier was introduced in @w{ISO C23}.
 
 @item z
 Specifies that the argument is a @code{size_t *}.

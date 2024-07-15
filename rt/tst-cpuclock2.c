@@ -1,5 +1,5 @@
 /* Test program for process and thread CPU clocks.
-   Copyright (C) 2005-2023 Free Software Foundation, Inc.
+   Copyright (C) 2005-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -37,6 +37,8 @@ do_test ()
 #include <errno.h>
 #include <pthread.h>
 
+#include <support/xunistd.h>
+
 static pthread_barrier_t barrier;
 
 /* This function is intended to rack up both user and system time.  */
@@ -55,7 +57,7 @@ chew_cpu (void *arg)
       for (int i = 0; i < 100; ++i)
 	for (size_t j = 0; j < sizeof buf; ++j)
 	  buf[j] = 0xbb;
-      write (nullfd, (char *) buf, sizeof buf);
+      xwrite (nullfd, (char *) buf, sizeof buf);
       close (nullfd);
     }
 

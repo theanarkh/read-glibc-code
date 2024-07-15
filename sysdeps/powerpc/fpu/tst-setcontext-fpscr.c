@@ -1,4 +1,4 @@
-/* Copyright (C) 2001-2023 Free Software Foundation, Inc.
+/* Copyright (C) 2001-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -26,6 +26,8 @@
 #include <fpu_control.h>
 #include <sys/auxv.h>
 #include <support/support.h>
+
+#include <support/xstdio.h>
 
 static ucontext_t ctx[3];
 
@@ -61,7 +63,7 @@ ElfW(Addr) query_auxv(int type)
 
       do
 	{
-	  fread (&auxv_struct, sizeof (ElfW(auxv_t)), 1, auxv_f);
+	  xfread (&auxv_struct, sizeof (ElfW(auxv_t)), 1, auxv_f);
 	  auxv[i] = auxv_struct;
 	  i++;
 	} while(auxv_struct.a_type != AT_NULL);

@@ -1,5 +1,5 @@
 /* Atomic operations.  PowerPC Common version.
-   Copyright (C) 2003-2023 Free Software Foundation, Inc.
+   Copyright (C) 2003-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -18,7 +18,7 @@
 
 /*
  * Never include sysdeps/powerpc/atomic-machine.h directly.
- * Alway use include/atomic.h which will include either
+ * Always use include/atomic.h which will include either
  * sysdeps/powerpc/powerpc32/atomic-machine.h
  * or
  * sysdeps/powerpc/powerpc64/atomic-machine.h

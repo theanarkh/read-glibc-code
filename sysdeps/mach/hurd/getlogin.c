@@ -1,4 +1,4 @@
-/* Copyright (C) 1991-2023 Free Software Foundation, Inc.
+/* Copyright (C) 1991-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -29,10 +29,7 @@ getlogin (void)
   error_t err;
 
   if (err = __USEPORT (PROC, __proc_getlogin (port, login)))
-    {
-      errno = err;
-      return NULL;
-    }
+    return __hurd_fail (err), NULL;
 
   return login;
 }

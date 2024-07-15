@@ -1,5 +1,5 @@
 /* Manage function descriptors.  Generic version.
-   Copyright (C) 1999-2023 Free Software Foundation, Inc.
+   Copyright (C) 1999-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -230,7 +230,7 @@ _dl_make_fptr (struct link_map *map, const ElfW(Sym) *sym,
       if (__builtin_expect (COMPARE_AND_SWAP (&ftab[symidx], (ElfW(Addr)) NULL,
 					      fdesc), 1))
 	{
-	  /* Noone has updated the entry and the new function
+	  /* No one has updated the entry and the new function
 	     descriptor has been installed.  */
 #if 0
 	  const char *strtab

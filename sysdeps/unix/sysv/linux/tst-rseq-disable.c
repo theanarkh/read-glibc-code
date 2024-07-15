@@ -1,5 +1,5 @@
 /* Test disabling of rseq registration via tunable.
-   Copyright (C) 2021-2023 Free Software Foundation, Inc.
+   Copyright (C) 2021-2024 Free Software Foundation, Inc.
 
    The GNU C Library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,7 @@
 #include <support/xthread.h>
 #include <sysdep.h>
 #include <thread_pointer.h>
+#include <sys/rseq.h>
 #include <unistd.h>
 
 #ifdef RSEQ_SIG

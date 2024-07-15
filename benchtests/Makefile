@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2023 Free Software Foundation, Inc.
+# Copyright (C) 2013-2024 Free Software Foundation, Inc.
 # Copyright The GNU Toolchain Authors.
 # This file is part of the GNU C Library.
 
@@ -32,6 +32,8 @@ bench-math := \
   atan2 \
   atanh \
   cbrt \
+  ceil \
+  ceilf \
   cos \
   cosf \
   cosh \
@@ -44,10 +46,14 @@ bench-math := \
   exp2f \
   expf \
   expm1 \
+  floor \
+  floorf \
   fmax \
   fmaxf \
   fmin \
   fminf \
+  fmod \
+  fmodf \
   hypot \
   hypotf \
   ilogb \
@@ -58,6 +64,8 @@ bench-math := \
   j0 \
   j1 \
   lgamma \
+  llrint \
+  llrintf \
   log \
   log10 \
   log1p \
@@ -66,10 +74,15 @@ bench-math := \
   logb \
   logbf \
   logf \
+  lrint \
+  lrintf \
   modf \
+  nearbyint \
+  nearbyintf \
   pow \
   powf \
   rint \
+  rintf \
   roundeven \
   roundevenf \
   sin \
@@ -85,11 +98,12 @@ bench-math := \
   truncf \
   y0 \
   y1 \
+  # bench-math
 
 ifneq (,$(filter yes,$(float96-fcts)))
 bench-math += \
   cbrtl \
-# bench-math
+  # bench-math
 endif
 
 ifneq (,$(filter yes,$(float128-fcts) $(float128-alias-fcts)))
@@ -98,7 +112,7 @@ bench-math += \
   ilogbf128 \
   powf128 \
   sinf128 \
-# bench-math
+  # bench-math
 endif
 
 bench-pthread := \
@@ -109,7 +123,7 @@ bench-pthread := \
   pthread-spin-trylock \
   pthread_once \
   thread_create \
-# bench-pthread
+  # bench-pthread
 
 LDLIBS-bench-pthread-mutex-lock += -lm
 LDLIBS-bench-pthread-mutex-trylock += -lm
@@ -119,13 +133,12 @@ LDLIBS-bench-pthread-spin-trylock += -lm
 bench-string := \
   ffs \
   ffsll \
-# bench-string
+  # bench-string
 
 # String function benchmarks.
 string-benchset := \
   bzero \
   bzero-large \
-  bzero-walk \
   memccpy \
   memchr \
   memcmp \
@@ -133,19 +146,15 @@ string-benchset := \
   memcpy \
   memcpy-large \
   memcpy-random \
-  memcpy-walk \
   memmem \
   memmove \
   memmove-large \
-  memmove-walk \
   mempcpy \
   memrchr \
   memset \
   memset-large \
-  memset-walk \
   memset-zero \
   memset-zero-large \
-  memset-zero-walk \
   rawmemchr \
   stpcpy \
   stpcpy_chk \
@@ -172,7 +181,7 @@ string-benchset := \
   strspn \
   strstr \
   strtok \
-# string-benchset
+  # string-benchset
 
 # Build and run locale-dependent benchmarks only if we're building natively.
 ifeq (no,$(cross-compiling))
@@ -197,7 +206,7 @@ wcsmbs-benchset := \
   wmemchr \
   wmemcmp \
   wmemset \
-# wcsmbs-benchset
+  # wcsmbs-benchset
 else
 wcsmbs-benchset :=
 endif
@@ -231,7 +240,7 @@ LOCALES := \
   tr_TR.UTF-8 \
   vi_VN.UTF-8 \
   zh_CN.UTF-8 \
-# LOCALES
+  # LOCALES
 include ../gen-locales.mk
 endif
 
@@ -239,20 +248,31 @@ hash-benchset := \
   dl-elf-hash \
   dl-new-hash \
   nss-hash \
-# hash-benchset
+  # hash-benchset
 
 stdlib-benchset := \
   arc4random \
+  random-lock \
   strtod \
   # stdlib-benchset
+
+stdio-benchset := \
+  fclose \
+  # stdio-benchset
 
 stdio-common-benchset := sprintf
 
 math-benchset := math-inlines
 
 ifeq (${BENCHSET},)
-benchset := $(string-benchset-all) $(stdlib-benchset) $(stdio-common-benchset) \
-	    $(math-benchset) $(hash-benchset)
+benchset := \
+  $(hash-benchset) \
+  $(math-benchset) \
+  $(stdio-benchset) \
+  $(stdio-common-benchset) \
+  $(stdlib-benchset) \
+  $(string-benchset-all) \
+  # benchset
 else
 benchset := $(foreach B,$(filter %-benchset,${BENCHSET}), ${${B}})
 endif
@@ -273,7 +293,10 @@ CFLAGS-bench-isinf.c += $(config-cflags-signaling-nans)
 CFLAGS-bench-isfinite.c += $(config-cflags-signaling-nans)
 
 ifeq (${BENCHSET},)
-bench-malloc := malloc-thread malloc-simple
+bench-malloc := \
+  malloc-simple \
+  malloc-thread \
+  # bench-malloc
 else
 bench-malloc := $(filter malloc-%,${BENCHSET})
 endif
@@ -350,7 +373,11 @@ include ../Rules
 bench-math += $(bench-libmvec)
 
 ifeq (${BENCHSET},)
-bench := $(bench-math) $(bench-pthread) $(bench-string)
+bench := \
+  $(bench-math) \
+  $(bench-pthread) \
+  $(bench-string) \
+  # bench
 else
 bench := $(foreach B,$(filter bench-%,${BENCHSET}), ${${B}})
 endif
@@ -366,8 +393,12 @@ extra-objs += $(addsuffix .o,$(addprefix bench-,$(bench-malloc)))
 
 # This makes sure CPPFLAGS-nonlib and CFLAGS-nonlib are passed
 # for all these modules.
-cpp-srcs-left := $(binaries-benchset:=.c) $(binaries-bench:=.c) \
-		 $(binaries-bench-malloc:=.c) $(timing-type:=.c)
+cpp-srcs-left := \
+  $(binaries-bench-malloc:=.c) \
+  $(binaries-bench:=.c) \
+  $(binaries-benchset:=.c) \
+  $(timing-type:=.c) \
+  # cpp-srcs-left
 lib := nonlib
 include $(patsubst %,$(..)libof-iterator.mk,$(cpp-srcs-left))
 
@@ -388,11 +419,12 @@ VALIDBENCHSETNAMES := \
   malloc-simple \
   malloc-thread \
   math-benchset \
+  stdio-benchset \
   stdio-common-benchset \
   stdlib-benchset \
   string-benchset \
   wcsmbs-benchset \
-# VALIDBENCHSETNAMES
+  # VALIDBENCHSETNAMES
 
 INVALIDBENCHSETNAMES := $(filter-out ${VALIDBENCHSETNAMES},${BENCHSET})
 ifneq (${INVALIDBENCHSETNAMES},)

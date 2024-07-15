@@ -1,5 +1,5 @@
-/* Machine dependent pthreads internal defenitions.  x86 version.
-   Copyright (C) 2000-2023 Free Software Foundation, Inc.
+/* Machine dependent pthreads internal definitions.  x86 version.
+   Copyright (C) 2000-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or

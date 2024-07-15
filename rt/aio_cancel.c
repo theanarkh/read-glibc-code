@@ -1,5 +1,5 @@
 /* Cancel requests associated with given file descriptor.
-   Copyright (C) 1997-2023 Free Software Foundation, Inc.
+   Copyright (C) 1997-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -106,7 +106,7 @@ __aio_cancel (int fildes, struct aiocb *aiocbp)
   else
     {
       /* Find the beginning of the list of all requests for this
-	 desriptor.  */
+	 descriptor.  */
       req = __aio_find_req_fd (fildes);
 
       /* If any request is worked on by a thread it must be the first.

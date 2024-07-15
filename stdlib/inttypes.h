@@ -1,4 +1,4 @@
-/* Copyright (C) 1997-2023 Free Software Foundation, Inc.
+/* Copyright (C) 1997-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -165,7 +165,7 @@ typedef wchar_t __gwchar_t;
 # define PRIXPTR	__PRIPTR_PREFIX "X"
 
 /* Binary notation.  */
-# if __GLIBC_USE (ISOC2X)
+# if __GLIBC_USE (ISOC23)
 #  define PRIb8		"b"
 #  define PRIb16	"b"
 #  define PRIb32	"b"
@@ -294,12 +294,34 @@ typedef wchar_t __gwchar_t;
 # define SCNuMAX	__PRI64_PREFIX "u"
 # define SCNxMAX	__PRI64_PREFIX "x"
 
-/* Macros for scaning `intptr_t' and `uintptr_t'.  */
+/* Macros for scanning `intptr_t' and `uintptr_t'.  */
 # define SCNdPTR	__PRIPTR_PREFIX "d"
 # define SCNiPTR	__PRIPTR_PREFIX "i"
 # define SCNoPTR	__PRIPTR_PREFIX "o"
 # define SCNuPTR	__PRIPTR_PREFIX "u"
 # define SCNxPTR	__PRIPTR_PREFIX "x"
+
+
+/* Binary notation.  */
+# if __GLIBC_USE (ISOC23)
+#  define SCNb8		"hhb"
+#  define SCNb16	"hb"
+#  define SCNb32	"b"
+#  define SCNb64	__PRI64_PREFIX "b"
+
+#  define SCNbLEAST8	"hhb"
+#  define SCNbLEAST16	"hb"
+#  define SCNbLEAST32	"b"
+#  define SCNbLEAST64	__PRI64_PREFIX "b"
+
+#  define SCNbFAST8	"hhb"
+#  define SCNbFAST16	__PRIPTR_PREFIX "b"
+#  define SCNbFAST32	__PRIPTR_PREFIX "b"
+#  define SCNbFAST64	__PRI64_PREFIX "b"
+
+#  define SCNbMAX	__PRI64_PREFIX "b"
+#  define SCNbPTR	__PRIPTR_PREFIX "b"
+# endif
 
 
 __BEGIN_DECLS
@@ -352,7 +374,7 @@ extern uintmax_t wcstoumax (const __gwchar_t *__restrict __nptr,
 
 /* Versions of the above functions that handle '0b' and '0B' prefixes
    in base 0 or 2.  */
-#if __GLIBC_USE (C2X_STRTOL)
+#if __GLIBC_USE (C23_STRTOL)
 # ifdef __REDIRECT
 extern intmax_t __REDIRECT_NTH (strtoimax, (const char *__restrict __nptr,
 					    char **__restrict __endptr,

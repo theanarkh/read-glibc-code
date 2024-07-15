@@ -1,5 +1,5 @@
 /* Statistical tests for arc4random-related functions.
-   Copyright (C) 2022-2023 Free Software Foundation, Inc.
+   Copyright (C) 2022-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -117,7 +117,7 @@ generate_arc4random_uniform (unsigned char *key)
 
 /* Test adapter for arc4random_uniform with argument 257.  This means
    that byte 0 happens more often, but we do not perform such a
-   statistcal check, so the test will still pass */
+   statistical check, so the test will still pass */
 static bool
 generate_arc4random_uniform_257 (unsigned char *key)
 {

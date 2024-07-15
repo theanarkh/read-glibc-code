@@ -1,5 +1,5 @@
 /* Fetch the host's network interface list.  Hurd version.
-   Copyright (C) 2002-2023 Free Software Foundation, Inc.
+   Copyright (C) 2002-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -54,7 +54,7 @@ __ifreq (struct ifreq **ifreqs, int *num_ifs, int sockfd)
       if (len % sizeof (struct ifreq) != 0)
 	{
 	  __munmap (data, len);
-	  errno = EGRATUITOUS;
+	  __hurd_fail (EGRATUITOUS);
 	  goto out;
 	}
       *num_ifs = len / sizeof (struct ifreq);

@@ -1,5 +1,5 @@
 /* Assembler macros for ARC.
-   Copyright (C) 2020-2023 Free Software Foundation, Inc.
+   Copyright (C) 2020-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -182,11 +182,11 @@ hidden_proto (__syscall_error)
   __ret = (long int) (arg1);					\
   LOAD_ARGS_0 (nm, arg1)
 
-/* Note that the use of _tmpX might look superflous, however it is needed
+/* Note that the use of _tmpX might look superfluous, however it is needed
    to ensure that register variables are not clobbered if arg happens to be
    a function call itself. e.g. sched_setaffinity() calling getpid() for arg2
    Also this specific order of recursive calling is important to segregate
-   the tmp args evaluation (function call case described above) and assigment
+   the tmp args evaluation (function call case described above) and assignment
    of register variables.  */
 
 # define LOAD_ARGS_2(nm, arg1, arg2)			\

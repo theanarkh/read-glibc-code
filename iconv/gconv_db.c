@@ -1,5 +1,5 @@
 /* Provide access to the collection of available transformation modules.
-   Copyright (C) 1997-2023 Free Software Foundation, Inc.
+   Copyright (C) 1997-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -169,7 +169,7 @@ add_derivation (const char *fromset, const char *toset,
      not all memory will be freed.  */
 }
 
-static void __libc_freeres_fn_section
+static void
 free_derivation (void *p)
 {
   struct known_derivation *deriv = (struct known_derivation *) p;
@@ -793,7 +793,6 @@ __gconv_close_transform (struct __gconv_step *steps, size_t nsteps)
 
 /* Free the modules mentioned.  */
 static void
-__libc_freeres_fn_section
 free_modules_db (struct gconv_module *node)
 {
   if (node->left != NULL)
@@ -812,7 +811,8 @@ free_modules_db (struct gconv_module *node)
 
 
 /* Free all resources if necessary.  */
-libc_freeres_fn (free_mem)
+void
+__gconv_db_freemem (void)
 {
   /* First free locale memory.  This needs to be done before freeing
      derivations, as ctype cleanup functions dereference steps arrays which we

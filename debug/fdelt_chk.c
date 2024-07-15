@@ -1,4 +1,4 @@
-/* Copyright (C) 2011-2023 Free Software Foundation, Inc.
+/* Copyright (C) 2011-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -28,3 +28,4 @@ __fdelt_chk (long int d)
   return d / __NFDBITS;
 }
 strong_alias (__fdelt_chk, __fdelt_warn)
+libc_hidden_def (__fdelt_chk)

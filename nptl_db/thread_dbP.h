@@ -1,5 +1,5 @@
 /* Private header for thread debug library
-   Copyright (C) 2003-2023 Free Software Foundation, Inc.
+   Copyright (C) 2003-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -32,7 +32,7 @@
 #include <gnu/lib-names.h>
 #include <libc-diag.h>
 
-/* Indeces for the symbol names.  */
+/* Indices for the symbol names.  */
 enum
   {
 # define DB_STRUCT(type)		SYM_SIZEOF_##type,
@@ -61,7 +61,9 @@ enum
 
 /* Comment out the following for less verbose output.  */
 #ifndef NDEBUG
-# define LOG(c) if (__td_debug) write (2, c "\n", strlen (c "\n"))
+# define LOG(c) \
+  if (__td_debug) \
+    assert (write (2, c "\n", strlen (c "\n")) == strlen (c "\n"))
 extern int __td_debug attribute_hidden;
 #else
 # define LOG(c)

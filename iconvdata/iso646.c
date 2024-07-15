@@ -1,5 +1,5 @@
 /* Conversion to and from the various ISO 646 CCS.
-   Copyright (C) 1998-2023 Free Software Foundation, Inc.
+   Copyright (C) 1998-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -21,7 +21,7 @@
    zillions of ISO 646 derivates and supporting them all in a separate
    module is overkill since these coded character sets are hardly ever
    used anymore (except ANSI_X3.4-1968 == ASCII, which is compatible
-   with ISO 8859-1).  The European variants are superceded by the
+   with ISO 8859-1).  The European variants are superseded by the
    various ISO 8859-? standards and the Asian variants are embedded in
    larger character sets.  Therefore this implementation is simply
    here to make it possible to do the conversion if it is necessary.

@@ -1,5 +1,5 @@
 /* memcmp with SSSE3, wmemcmp with SSSE3
-   Copyright (C) 2010-2023 Free Software Foundation, Inc.
+   Copyright (C) 2010-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -44,7 +44,7 @@
 
 /* Warning!
            wmemcmp has to use SIGNED comparison for elements.
-           memcmp has to use UNSIGNED comparison for elemnts.
+           memcmp has to use UNSIGNED comparison for elements.
 */
 
 	atom_text_section

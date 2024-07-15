@@ -1,5 +1,5 @@
 /* Definitions for POSIX memory map interface.  Linux/HPPA version.
-   Copyright (C) 1997-2023 Free Software Foundation, Inc.
+   Copyright (C) 1997-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -24,7 +24,6 @@
 
 /* Other flags.  */
 #define __MAP_ANONYMOUS	0x10		/* Don't use a file */
-#define MAP_VARIABLE	0
 
 /* These are Linux-specific.  */
 #define MAP_DENYWRITE	0x0800		/* ETXTBSY */

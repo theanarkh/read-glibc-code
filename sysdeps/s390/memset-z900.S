@@ -1,5 +1,5 @@
 /* Set a block of memory to some byte value.  31/64 bit S/390 version.
-   Copyright (C) 2001-2023 Free Software Foundation, Inc.
+   Copyright (C) 2001-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -166,7 +166,7 @@ ENTRY(__memset_mvcle)
 	lgr	%r3,%r4             # move length to r3
 	sgr	%r4,%r4		    # no source for MVCLE, only a pad byte
 	sgr	%r5,%r5
-.L0:	mvcle	%r2,%r4,0(%r1)	    # thats it, MVCLE is your friend
+.L0:	mvcle	%r2,%r4,0(%r1)	    # that's it, MVCLE is your friend
 	jo	.L0
 	lgr	%r2,%r0		    # return value is source address
 .L1:

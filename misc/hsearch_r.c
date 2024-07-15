@@ -1,4 +1,4 @@
-/* Copyright (C) 1993-2023 Free Software Foundation, Inc.
+/* Copyright (C) 1993-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -160,7 +160,7 @@ __hsearch_r (ENTRY item, ACTION action, ENTRY **retval,
   if (hval == 0)
     ++hval;
 
-  /* First hash function: simply take the modul but prevent zero. */
+  /* First hash function: simply take the modulo but prevent zero. */
   idx = hval % htab->size + 1;
 
   if (htab->table[idx].used)

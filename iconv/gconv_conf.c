@@ -1,5 +1,5 @@
 /* Handle configuration data.
-   Copyright (C) 1997-2023 Free Software Foundation, Inc.
+   Copyright (C) 1997-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -153,7 +153,7 @@ static void
 add_alias (char *rp)
 {
   /* We now expect two more string.  The strings are normalized
-     (converted to UPPER case) and strored in the alias database.  */
+     (converted to UPPER case) and stored in the alias database.  */
   char *from, *to, *wp;
 
   while (__isspace_l (*rp, _nl_C_locobj_ptr))
@@ -530,7 +530,8 @@ __gconv_load_conf (void)
 
 
 /* Free all resources if necessary.  */
-libc_freeres_fn (free_mem)
+void
+__gconv_conf_freemem (void)
 {
   if (__gconv_path_elem != NULL && __gconv_path_elem != &empty_path_elem)
     free ((void *) __gconv_path_elem);

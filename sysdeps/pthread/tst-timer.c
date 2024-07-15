@@ -1,5 +1,5 @@
 /* Tests for POSIX timer implementation.
-   Copyright (C) 2000-2023 Free Software Foundation, Inc.
+   Copyright (C) 2000-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#include <support/xunistd.h>
 
 static void
 notify_func1 (union sigval sigval)
@@ -44,7 +45,7 @@ signal_func (int sig)
 {
   static const char text[] = "signal_func\n";
   signal (sig, signal_func);
-  write (STDOUT_FILENO, text, sizeof text - 1);
+  xwrite (STDOUT_FILENO, text, sizeof text - 1);
 }
 
 static void

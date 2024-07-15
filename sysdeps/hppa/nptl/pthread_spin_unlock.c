@@ -1,4 +1,4 @@
-/* Copyright (C) 2005-2023 Free Software Foundation, Inc.
+/* Copyright (C) 2005-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -21,7 +21,7 @@
 int
 __pthread_spin_unlock (pthread_spinlock_t *lock)
 {
-  /* CONCURRENCTY NOTES:
+  /* CONCURRENCY NOTES:
 
      The atomic_exchange_release synchronizes-with the atomic_exhange_acq in
      pthread_spin_lock.

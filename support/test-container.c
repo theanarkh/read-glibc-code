@@ -1,5 +1,5 @@
 /* Run a test case in an isolated namespace.
-   Copyright (C) 2018-2023 Free Software Foundation, Inc.
+   Copyright (C) 2018-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -37,6 +37,7 @@
 #include <errno.h>
 #include <error.h>
 #include <libc-pointer-arith.h>
+#include <ftw.h>
 
 #ifdef __linux__
 #include <sys/mount.h>
@@ -279,7 +280,7 @@ devmount (const char *new_root_path, const char *which)
 	    concat (new_root_path, "/dev/", which, NULL));
 }
 
-/* Returns true if the string "looks like" an environement variable
+/* Returns true if the string "looks like" an environment variable
    being set.  */
 static int
 is_env_setting (const char *a)
@@ -405,32 +406,19 @@ file_exists (char *path)
   return 0;
 }
 
+static int
+unlink_cb (const char *fpath, const struct stat *sb, int typeflag,
+	   struct FTW *ftwbuf)
+{
+  return remove (fpath);
+}
+
 static void
 recursive_remove (char *path)
 {
-  pid_t child;
-  int status;
-
-  child = fork ();
-
-  switch (child) {
-  case -1:
-    perror("fork");
-    FAIL_EXIT1 ("Unable to fork");
-  case 0:
-    /* Child.  */
-    execlp ("rm", "rm", "-rf", path, NULL);
-    FAIL_EXIT1 ("exec rm: %m");
-  default:
-    /* Parent.  */
-    waitpid (child, &status, 0);
-    /* "rm" would have already printed a suitable error message.  */
-    if (! WIFEXITED (status)
-	|| WEXITSTATUS (status) != 0)
-      FAIL_EXIT1 ("exec child returned status: %d", status);
-
-    break;
-  }
+  int r = nftw (path, unlink_cb, 1000, FTW_DEPTH | FTW_PHYS);
+  if (r == -1)
+    FAIL_EXIT1 ("recursive_remove failed");
 }
 
 /* Used for both rsync and the mytest.script "cp" command.  */
@@ -694,6 +682,8 @@ check_for_unshare_hints (int require_pidns)
     { "/proc/sys/kernel/unprivileged_userns_clone", 0, 1, 0 },
     /* ALT Linux has an alternate way of doing the same.  */
     { "/proc/sys/kernel/userns_restrict", 1, 0, 0 },
+    /* AppArmor can also disable unprivileged user namespaces.  */
+    { "/proc/sys/kernel/apparmor_restrict_unprivileged_userns", 1, 0, 0 },
     /* Linux kernel >= 4.9 has a configurable limit on the number of
        each namespace.  Some distros set the limit to zero to disable the
        corresponding namespace as a "security policy".  */
@@ -714,8 +704,8 @@ check_for_unshare_hints (int require_pidns)
         continue;
 
       val = -1; /* Sentinel.  */
-      fscanf (f, "%d", &val);
-      if (val != files[i].bad_value)
+      int cnt = fscanf (f, "%d", &val);
+      if (cnt == 1 && val != files[i].bad_value)
 	continue;
 
       printf ("To enable test-container, please run this as root:\n");
@@ -800,7 +790,7 @@ main (int argc, char **argv)
       --argc;
       while (is_env_setting (argv[1]))
 	{
-	  /* If there are variables we do NOT want to propogate, this
+	  /* If there are variables we do NOT want to propagate, this
 	     is where the test for them goes.  */
 	    {
 	      /* Need to keep these.  Note that putenv stores a
@@ -1120,10 +1110,11 @@ main (int argc, char **argv)
     {
       /* Older kernels may not support all the options, or security
 	 policy may block this call.  */
-      if (errno == EINVAL || errno == EPERM || errno == ENOSPC)
+      if (errno == EINVAL || errno == EPERM
+          || errno == ENOSPC || errno == EACCES)
 	{
 	  int saved_errno = errno;
-	  if (errno == EPERM || errno == ENOSPC)
+	  if (errno == EPERM || errno == ENOSPC || errno == EACCES)
 	    check_for_unshare_hints (require_pidns);
 	  FAIL_UNSUPPORTED ("unable to unshare user/fs: %s", strerror (saved_errno));
 	}
@@ -1175,7 +1166,7 @@ main (int argc, char **argv)
 
   /* To complete the containerization, we need to fork () at least
      once.  We can't exec, nor can we somehow link the new child to
-     our parent.  So we run the child and propogate it's exit status
+     our parent.  So we run the child and propagate it's exit status
      up.  */
   child = fork ();
   if (child < 0)
@@ -1186,7 +1177,7 @@ main (int argc, char **argv)
       int status;
 
       /* Send the child's "outside" pid to it.  */
-      write (pipes[1], &child, sizeof(child));
+      xwrite (pipes[1], &child, sizeof(child));
       close (pipes[0]);
       close (pipes[1]);
 
@@ -1217,7 +1208,8 @@ main (int argc, char **argv)
 
   /* Get our "outside" pid from our parent.  We use this to help with
      debugging from outside the container.  */
-  read (pipes[0], &child, sizeof(child));
+  xread (pipes[0], &child, sizeof(child));
+
   close (pipes[0]);
   close (pipes[1]);
   sprintf (pid_buf, "%lu", (long unsigned)child);
@@ -1233,11 +1225,11 @@ main (int argc, char **argv)
 	{
 	  /* This happens if we're trying to create a nested container,
 	     like if the build is running under podman, and we lack
-	     priviledges.
+	     privileges.
 
 	     Ideally we would WARN here, but that would just add noise to
 	     *every* test-container test, and the ones that care should
-	     have their own relevent diagnostics.
+	     have their own relevant diagnostics.
 
 	     FAIL_EXIT1 ("Unable to mount /proc: ");  */
 	}
@@ -1255,7 +1247,7 @@ main (int argc, char **argv)
 
       sprintf (tmp, "%lld %lld 1\n",
 	       (long long) (be_su ? 0 : original_uid), (long long) original_uid);
-      write (UMAP, tmp, strlen (tmp));
+      xwrite (UMAP, tmp, strlen (tmp));
       xclose (UMAP);
 
       /* We must disable setgroups () before we can map our groups, else we
@@ -1264,7 +1256,7 @@ main (int argc, char **argv)
       if (GMAP >= 0)
 	{
 	  /* We support kernels old enough to not have this.  */
-	  write (GMAP, "deny\n", 5);
+	  xwrite (GMAP, "deny\n", 5);
 	  xclose (GMAP);
 	}
 
@@ -1276,7 +1268,7 @@ main (int argc, char **argv)
 
       sprintf (tmp, "%lld %lld 1\n",
 	       (long long) (be_su ? 0 : original_gid), (long long) original_gid);
-      write (GMAP, tmp, strlen (tmp));
+      xwrite (GMAP, tmp, strlen (tmp));
       xclose (GMAP);
     }
 

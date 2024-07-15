@@ -1,5 +1,5 @@
 /* Check recvmsg/recvmmsg 64-bit timestamp support.
-   Copyright (C) 2022-2023 Free Software Foundation, Inc.
+   Copyright (C) 2022-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -77,7 +77,7 @@ static void
 do_test_large_buffer (bool mc)
 {
   struct mmsghdr mmhdr = { 0 };
-  /* It should be large enought for either timeval/timespec and the
+  /* It should be large enough for either timeval/timespec and the
      64 time type as well.  */
 
   union
@@ -142,7 +142,7 @@ do_test_large_buffer (bool mc)
 
 /* Check if recvmsg does not create the additional 64 bit timestamp if
    only 32 bit timestamp is enabled if the ancillary buffer is not large
-   enought.  Also checks if MSG_CTRUNC is set iff for 64 bit recvmsg
+   enough.  Also checks if MSG_CTRUNC is set iff for 64 bit recvmsg
    symbol.  */
 static void
 do_test_small_buffer (bool mc)

@@ -1,5 +1,5 @@
 /* Simple DNS record parser without textual name decoding.
-   Copyright (C) 2022-2023 Free Software Foundation, Inc.
+   Copyright (C) 2022-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -54,7 +54,7 @@ __ns_rr_cursor_next (struct ns_rr_cursor *c, struct ns_rr_wire *rr)
     }
   memcpy (&metadata, c->current, sizeof (metadata));
   c->current += sizeof (metadata);
-  /* Endianess conversion.  */
+  /* Endianness conversion.  */
   rr->rtype = ntohs (metadata.rtype);
   rr->rclass = ntohs (metadata.rclass);
   rr->ttl = ntohl (metadata.ttl);

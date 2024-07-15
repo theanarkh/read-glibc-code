@@ -1,6 +1,6 @@
 /* memset/bzero -- set memory area to CH/0
    Highly optimized version for ix86, x>=5.
-   Copyright (C) 1996-2023 Free Software Foundation, Inc.
+   Copyright (C) 1996-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -33,6 +33,7 @@ ENTRY (__memset_chk)
 	cmpl	%eax, 16(%esp)
 	jb	HIDDEN_JUMPTARGET (__chk_fail)
 END (__memset_chk)
+libc_hidden_builtin_def (__memset_chk)
 #endif
 ENTRY (memset)
 

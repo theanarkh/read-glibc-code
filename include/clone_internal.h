@@ -5,7 +5,7 @@
 
 /* The clone3 syscall provides a superset of the functionality of the clone
    interface.  The kernel might extend __CL_ARGS struct in the future, with
-   each version with a diffent __SIZE.  If the child is created, it will
+   each version with a different __SIZE.  If the child is created, it will
    start __FUNC function with __ARG arguments.
 
    Different than kernel, the implementation also returns EINVAL for an
@@ -34,6 +34,10 @@ extern int __clone_internal_fallback (struct clone_args *__cl_args,
 				      int (*__func) (void *__arg),
 				      void *__arg)
      attribute_hidden;
+
+/* Return whether the kernel supports pid file descriptor, including clone
+   with CLONE_PIDFD and waitid with P_PIDFD.  */
+extern bool __clone_pidfd_supported (void) attribute_hidden;
 
 #ifndef _ISOMAC
 libc_hidden_proto (__clone3)

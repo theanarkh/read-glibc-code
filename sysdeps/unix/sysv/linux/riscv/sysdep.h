@@ -121,7 +121,7 @@
 # undef ret_NOERRNO
 # define ret_NOERRNO ret
 
-/* Perfroms a system call, returning the error code.  */
+/* Performs a system call, returning the error code.  */
 # undef PSEUDO_ERRVAL
 # define PSEUDO_ERRVAL(name, syscall_name, args) 	\
   PSEUDO_NOERRNO (name, syscall_name, args)		\
@@ -151,10 +151,12 @@
 
 /* RV32 does not support the gettime VDSO syscalls.  */
 # endif
+# define HAVE_CLONE3_WRAPPER		1
 
 /* List of system calls which are supported as vsyscalls (for RV32 and
    RV64).  */
 # define HAVE_GETCPU_VSYSCALL		"__vdso_getcpu"
+# define HAVE_RISCV_HWPROBE		"__vdso_riscv_hwprobe"
 
 # undef HAVE_INTERNAL_BRK_ADDR_SYMBOL
 # define HAVE_INTERNAL_BRK_ADDR_SYMBOL 1

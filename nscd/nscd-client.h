@@ -1,4 +1,4 @@
-/* Copyright (c) 1998-2023 Free Software Foundation, Inc.
+/* Copyright (c) 1998-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -389,7 +389,7 @@ extern int __nscd_open_socket (const char *key, size_t keylen,
 			       request_type type, void *response,
 			       size_t responselen) attribute_hidden;
 
-/* Try to get a file descriptor for the shared meory segment
+/* Try to get a file descriptor for the shared memory segment
    containing the database.  */
 extern struct mapped_database *__nscd_get_mapping (request_type type,
 						   const char *key,

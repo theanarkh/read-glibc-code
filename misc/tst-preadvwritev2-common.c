@@ -1,5 +1,5 @@
 /* Common function for preadv2 and pwritev2 tests.
-   Copyright (C) 2017-2023 Free Software Foundation, Inc.
+   Copyright (C) 2017-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -34,8 +34,11 @@
 #ifndef RWF_APPEND
 # define RWF_APPEND 0
 #endif
+#ifndef RWF_NOAPPEND
+# define RWF_NOAPPEND 0
+#endif
 #define RWF_SUPPORTED	(RWF_HIPRI | RWF_DSYNC | RWF_SYNC | RWF_NOWAIT \
-			 | RWF_APPEND)
+			 | RWF_APPEND | RWF_NOAPPEND)
 
 /* Generic uio_lim.h does not define IOV_MAX.  */
 #ifndef IOV_MAX

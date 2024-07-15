@@ -1,4 +1,4 @@
-/* Copyright (C) 2002-2023 Free Software Foundation, Inc.
+/* Copyright (C) 2002-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -144,6 +144,20 @@ do_test (void)
 					 &(struct args) { "echo ...", 0 });
     support_capture_subprocess_check (&result, "system", 0, sc_allow_stdout);
     TEST_COMPARE_STRING (result.out.buffer, "...\n");
+  }
+
+  {
+    struct support_capture_subprocess result;
+    const char *cmd = "-echo";
+    result = support_capture_subprocess (call_system,
+					 &(struct args) { cmd, 127 });
+    support_capture_subprocess_check (&result, "system", 0, sc_allow_stderr |
+			sc_allow_stdout);
+    char *returnerr = xasprintf ("%s: execing -echo failed: "
+				 "No such file or directory",
+				 basename(_PATH_BSHELL));
+    TEST_COMPARE_STRING (result.err.buffer, returnerr);
+    free (returnerr);
   }
 
   {

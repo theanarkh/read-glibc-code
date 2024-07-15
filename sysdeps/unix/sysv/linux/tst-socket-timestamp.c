@@ -1,5 +1,5 @@
 /* Check recvmsg/recvmmsg 64-bit timestamp support.
-   Copyright (C) 2022-2023 Free Software Foundation, Inc.
+   Copyright (C) 2022-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -284,7 +284,7 @@ do_test_multiple_ancillary (void)
     TEST_VERIFY_EXIT (r != -1);
   }
 
-  /* Enougth data for default SO_TIMESTAMP, the IP_RECVORIGDSTADDR, and the
+  /* Enough data for default SO_TIMESTAMP, the IP_RECVORIGDSTADDR, and the
      extra 64-bit SO_TIMESTAMP.  */
   enum { msgbuflen = CMSG_SPACE (2 * sizeof (uint64_t))
 		     + CMSG_SPACE (sizeof (struct sockaddr_in))

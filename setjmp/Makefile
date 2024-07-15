@@ -1,4 +1,4 @@
-# Copyright (C) 1991-2023 Free Software Foundation, Inc.
+# Copyright (C) 1991-2024 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 
 # The GNU C Library is free software; you can redistribute it and/or
@@ -37,5 +37,14 @@ tests-internal  := \
 gen-as-const-headers += jmp_buf-macros.sym
 
 include ../Rules
+
+# This test messes the stack on purpose, which triggers longjump fortify
+# failure
+CFLAGS-bug269-setjmp.c += $(no-fortify-source)
+
+# Exclude fortified routines from being built with _FORTIFY_SOURCE
+routines_no_fortify += \
+  longjmp \
+  # routines_no_fortify
 
 $(objpfx)tst-setjmp-fp: $(libm)

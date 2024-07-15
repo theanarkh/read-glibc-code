@@ -1,5 +1,5 @@
 /* PLT trampolines. hppa version.
-   Copyright (C) 2005-2023 Free Software Foundation, Inc.
+   Copyright (C) 2005-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -156,6 +156,7 @@ _dl_runtime_resolve:
 	cfi_endproc
 	.size   _dl_runtime_resolve, . - _dl_runtime_resolve
 
+#ifdef SHARED
         .text
         .global _dl_runtime_profile
         .type _dl_runtime_profile,@function
@@ -272,7 +273,7 @@ L(cpe):
 	addi	63, %r28, %r28
 	depi	0, 27, 6, %r28
 
-	/* Calcualte start of stack copy */
+	/* Calculate start of stack copy */
 	ldo	-192(%sp),%r2
 
 	/* Increate the stack by *framesizep */
@@ -281,14 +282,14 @@ L(cpe):
 	/* Save stack pointer */
 	stw	%r1, -4(%sp)
 
-	/* Single byte copy of prevous stack onto newly allocated stack */
+	/* Single byte copy of previous stack onto newly allocated stack */
 1:	ldb	%r28(%r2), %r1
 	add	%r28, %sp, %r26
 	stb	%r1, 0(%r26)
 	addi,<	-1,%r28,%r28
 	b,n	1b
 
-	/* Retore r28 and r27 and r2 already points at -192(%sp) */
+	/* Restore r28 and r27 and r2 already points at -192(%sp) */
 	ldw	0(%r2),%r28
 	ldw	84(%r2),%r26
 
@@ -324,7 +325,7 @@ L(cont):
 
 	/* Unwind the stack */
 	ldo	192(%sp),%sp
-	/* Retore callers rp */
+	/* Restore callers rp */
         ldw -20(%sp),%rp
 	/* Return */
 	bv,n	0(%r2)
@@ -359,3 +360,4 @@ L(cont):
         .PROCEND
 	cfi_endproc
 	.size   _dl_runtime_profile, . - _dl_runtime_profile
+#endif

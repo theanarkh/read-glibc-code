@@ -1,4 +1,4 @@
-/* Copyright (C) 2002-2023 Free Software Foundation, Inc.
+/* Copyright (C) 2002-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -31,6 +31,8 @@
 # define __link link
 # define __unlink unlink
 #endif
+
+#define SEM_OPEN_FLAGS (O_RDWR | O_NOFOLLOW | O_CLOEXEC)
 
 sem_t *
 __sem_open (const char *name, int oflag, ...)
@@ -65,8 +67,7 @@ __sem_open (const char *name, int oflag, ...)
   if ((oflag & O_CREAT) == 0 || (oflag & O_EXCL) == 0)
     {
     try_again:
-      fd = __open (dirname.name,
-		   (oflag & ~(O_CREAT|O_ACCMODE)) | O_NOFOLLOW | O_RDWR);
+      fd = __open (dirname.name, (oflag & O_EXCL) | SEM_OPEN_FLAGS);
 
       if (fd == -1)
 	{
@@ -133,7 +134,7 @@ __sem_open (const char *name, int oflag, ...)
 	    }
 
 	  /* Open the file.  Make sure we do not overwrite anything.  */
-	  fd = __open (tmpfname, O_RDWR | O_CREAT | O_EXCL, mode);
+	  fd = __open (tmpfname, O_CREAT | O_EXCL | SEM_OPEN_FLAGS, mode);
 	  if (fd == -1)
 	    {
 	      if (errno == EEXIST)

@@ -1,4 +1,4 @@
-/* Copyright (C) 2000-2023 Free Software Foundation, Inc.
+/* Copyright (C) 2000-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -48,7 +48,7 @@ fail_test (int c)
 
   if (wc != WEOF)
     {
-      printf ("%s: btowc('%c') succeded, returned L'\\x%x' instead of WEOF\n",
+      printf ("%s: btowc('%c') succeeded, returned L'\\x%x' instead of WEOF\n",
 	      current_locale, c, wc);
       return 1;
     }

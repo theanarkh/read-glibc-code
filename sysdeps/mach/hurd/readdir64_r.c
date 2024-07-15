@@ -1,4 +1,4 @@
-/* Copyright (C) 2001-2023 Free Software Foundation, Inc.
+/* Copyright (C) 2001-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -31,10 +31,7 @@ __readdir64_r (DIR *dirp, struct dirent64 *entry, struct dirent64 **result)
   error_t err = 0;
 
   if (dirp == NULL)
-    {
-      errno = EINVAL;
-      return errno;
-    }
+    return __hurd_fail (EINVAL), EINVAL;
 
   __libc_lock_lock (dirp->__lock);
 
